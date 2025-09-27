@@ -8,7 +8,9 @@ import { useSidebarStore } from '../../stores/sidebarStore';
 import { ViewMode, ShareData } from '../../types/editor';
 import { copyToClipboard, createShareUrl, generateShareId } from '../../utils/clipboardUtils';
 import { DEFAULT_CHAR_LIMIT, COPY_SUCCESS_DURATION, MOBILE_BREAKPOINT, MIN_CHAR_LIMIT, MAX_CHAR_LIMIT, CHAR_LIMIT_STEP } from '../../constants/editor';
-import { ModeButton, Button } from '../../components/common/CharacterCount';
+import { ModeButton } from '../../components/common/ModeButton';
+import { Button } from '../../components/common/Button';
+import { InputGroup, InputLabel, InputField } from '../../components/common/Input';
 
 // 에디터 페이지는 독립적으로 렌더링
 export const dynamic = 'force-dynamic';
@@ -195,27 +197,24 @@ export default function EditorPage() {
       <div className="mt-20 px-16 py-4 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         {viewMode === 'original' ? (
           <div className="flex items-center gap-8 flex-wrap">
-            <div className="flex items-center gap-4 flex-1 min-w-[300px]">
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">문항</label>
-              <input
+            <InputGroup>
+              <InputLabel htmlFor="question-input">문항</InputLabel>
+              <InputField
+                id="question-input"
                 type="text"
-                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm 
-                         focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
-                         dark:bg-gray-700 dark:text-white"
                 value={questionText}
-                onChange={(e) => handleQuestionChange(e.target.value)}
+                onChange={handleQuestionChange}
                 placeholder="자소서 문항을 입력하세요..."
               />
-            </div>
+            </InputGroup>
             <div className="flex items-center gap-2">
-              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">글자수 제한</label>
-              <input
+              <InputLabel htmlFor="char-limit-input">글자수 제한</InputLabel>
+              <InputField
+                id="char-limit-input"
                 type="number"
-                className="w-20 px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm 
-                         focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
-                         dark:bg-gray-700 dark:text-white text-center"
                 value={questionCharLimit}
-                onChange={(e) => handleQuestionLimitChange(parseInt(e.target.value) || DEFAULT_CHAR_LIMIT)}
+                onChange={(value) => handleQuestionLimitChange(parseInt(value) || DEFAULT_CHAR_LIMIT)}
+                className="w-20 text-center"
                 min={MIN_CHAR_LIMIT}
                 max={MAX_CHAR_LIMIT}
                 step={CHAR_LIMIT_STEP}
@@ -278,12 +277,12 @@ export default function EditorPage() {
               </button>
             </div>
             <div className="flex gap-2 mb-4">
-              <input
+              <InputField
                 type="text"
                 value={shareUrl}
-                readOnly
-                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
-                         bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                onChange={() => {}} // readOnly이므로 빈 함수
+                className="flex-1 bg-gray-50 dark:bg-gray-700 text-sm"
+                placeholder="공유 URL"
               />
               <Button
                 variant={isCopied ? 'secondary' : 'primary'}
