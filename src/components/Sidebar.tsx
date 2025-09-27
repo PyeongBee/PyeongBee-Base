@@ -34,7 +34,7 @@ export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
               <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">P</span>
               </div>
-              <span className="font-semibold text-gray-900 dark:text-white">PyeongBee-Base</span>
+              <span className="font-semibold text-gray-900 dark:text-white">PyeongBee</span>
             </div>
           ) : (
             <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
@@ -52,14 +52,18 @@ export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
             <a
               key={index}
               href={item.href}
-              className={`flex items-center px-3 py-2 rounded-lg transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-800 hover:scale-105 ${
-                isCollapsed ? 'justify-center' : 'space-x-3'
+              className={`flex items-center rounded-lg transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-800 hover:scale-105 h-9 ${
+                isCollapsed 
+                  ? 'justify-center px-3' 
+                  : 'px-3'
               }`}
               title={isCollapsed ? item.label : undefined}
             >
-              <IconComponent className="w-5 h-5 text-gray-600 dark:text-gray-400 flex-shrink-0" />
+              <div className="flex items-center justify-center w-5 h-5 flex-shrink-0">
+                <IconComponent className="w-5 h-5 text-gray-600 dark:text-gray-400" />
+              </div>
               {!isCollapsed && (
-                <span className="text-gray-700 dark:text-gray-300 whitespace-nowrap">{item.label}</span>
+                <span className="text-gray-700 dark:text-gray-300 whitespace-nowrap ml-3 text-sm leading-5">{item.label}</span>
               )}
             </a>
           );
