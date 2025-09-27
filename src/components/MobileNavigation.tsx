@@ -7,6 +7,7 @@ import {
   User, 
   MoreHorizontal
 } from 'lucide-react';
+import { LONG_PRESS_DURATION } from '../constants/editor';
 
 export default function MobileNavigation() {
   const [hoveredItem, setHoveredItem] = useState<number | null>(null);
@@ -30,7 +31,7 @@ export default function MobileNavigation() {
   const handleTouchStart = (index: number) => {
     const timer = setTimeout(() => {
       setHoveredItem(index);
-    }, 500); // 0.5초 후 툴팁 표시
+    }, LONG_PRESS_DURATION); // 0.5초 후 툴팁 표시
     setLongPressTimer(timer);
   };
 

@@ -1,5 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import * as Diff from 'diff';
+import { getTextStats } from '../../utils/textUtils';
+import { copyToClipboard } from '../../utils/clipboardUtils';
+import { COPY_SUCCESS_DURATION } from '../../constants/editor';
+import CharacterCount from '../common/CharacterCount';
 
 interface DiffViewerProps {
   originalText: string;
@@ -13,37 +17,23 @@ interface DiffPart {
   removed?: boolean;
 }
 
-const DiffViewer: React.FC<DiffViewerProps> = ({ originalText, editedText, charLimit }) => {
+const DiffViewer: React.FC<DiffViewerProps> = React.memo(({ originalText, editedText, charLimit }) => {
   const [isCopied, setIsCopied] = useState<boolean>(false);
   // diff 라이브러리를 사용하여 변경사항 계산 (단어 단위로 비교)
   const diffParts: DiffPart[] = Diff.diffWords(originalText, editedText);
 
-  const getCharacterCount = (text: string) => text.length;
-  const getWordCount = (text: string) => text.trim() ? text.trim().split(/\s+/).length : 0;
-  const getLineCount = (text: string) => text ? text.split('\n').length : 0;
+  const editedStats = getTextStats(editedText, charLimit);
 
-  const editedCharCount = getCharacterCount(editedText);
-  const editedWordCount = getWordCount(editedText);
-  const editedLineCount = getLineCount(editedText);
-
-  const handleCopyResult = async () => {
-    try {
-      await navigator.clipboard.writeText(editedText);
+  const handleCopyResult = useCallback(async () => {
+    const result = await copyToClipboard(editedText);
+    if (result.success) {
       setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 2000);
-    } catch (err) {
-      console.error('복사 실패:', err);
-      // 폴백: 텍스트 선택
-      const textArea = document.createElement('textarea');
-      textArea.value = editedText;
-      document.body.appendChild(textArea);
-      textArea.select();
-      document.execCommand('copy');
-      document.body.removeChild(textArea);
-      setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 2000);
+      setTimeout(() => setIsCopied(false), COPY_SUCCESS_DURATION);
+    } else {
+      // 에러 메시지를 사용자에게 표시할 수 있도록 상태 추가 가능
+      console.error('복사 실패:', result.message);
     }
-  };
+  }, [editedText]);
 
   // 원본 텍스트 렌더링 (변경사항 없이 원본만 표시)
   const renderOriginalText = () => {
@@ -149,36 +139,23 @@ const DiffViewer: React.FC<DiffViewerProps> = ({ originalText, editedText, charL
             <label className="editor-label">
               최종 결과
             </label>
-            <div className="character-count">
-              <div className={`count-item ${editedCharCount > charLimit ? 'over-limit' : ''}`}>
-                <span className="count-label">글자수:</span>
-                <span className="count-value">
-                  {editedCharCount.toLocaleString()}
-                </span>
-              </div>
-              <div className="count-item">
-                <span className="count-label">단어수:</span>
-                <span className="count-value">{editedWordCount.toLocaleString()}</span>
-              </div>
-              <div className="count-item">
-                <span className="count-label">줄수:</span>
-                <span className="count-value">{editedLineCount.toLocaleString()}</span>
-              </div>
-              <button 
-                className={`copy-result-button ${isCopied ? 'copy-success' : ''}`}
-                onClick={handleCopyResult}
-                title={isCopied ? "복사됨!" : "최종 결과 복사"}
-              >
-                {isCopied ? '✓' : '📋'}
-              </button>
-            </div>
+            <CharacterCount
+              characterCount={editedStats.characterCount}
+              wordCount={editedStats.wordCount}
+              lineCount={editedStats.lineCount}
+              charLimit={charLimit}
+              isOverLimit={editedStats.isOverLimit}
+              showCopyButton={true}
+              onCopy={handleCopyResult}
+              isCopied={isCopied}
+            />
           </div>
-          <div className="editor-readonly">
+          <div className="editor-readonly" role="textbox" aria-label="최종 결과">
             {editedText || <em>수정된 텍스트가 없습니다.</em>}
           </div>
         </div>
     </div>
   );
-};
+});
 
 export default DiffViewer;

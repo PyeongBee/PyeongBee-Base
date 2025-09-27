@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Sidebar from './Sidebar';
 import MobileNavigation from './MobileNavigation';
 import { useSidebarStore } from '../stores/sidebarStore';
+import { MOBILE_BREAKPOINT } from '../constants/editor';
 
 interface LayoutWrapperProps {
   children: React.ReactNode;
@@ -18,7 +19,7 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
     setIsClient(true);
     
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
+      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
     };
     
     checkMobile();

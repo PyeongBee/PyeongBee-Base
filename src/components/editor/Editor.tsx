@@ -1,4 +1,6 @@
 import React from 'react';
+import { getTextStats } from '../../utils/textUtils';
+import CharacterCount from '../common/CharacterCount';
 
 interface EditorProps {
   originalText: string;
@@ -8,24 +10,15 @@ interface EditorProps {
   charLimit: number;
 }
 
-const Editor: React.FC<EditorProps> = ({
+const Editor: React.FC<EditorProps> = React.memo(({
   originalText,
   editedText,
   onOriginalChange,
   onEditedChange,
   charLimit
 }) => {
-  const getCharacterCount = (text: string) => text.length;
-  const getWordCount = (text: string) => text.trim() ? text.trim().split(/\s+/).length : 0;
-  const getLineCount = (text: string) => text ? text.split('\n').length : 0;
-
-  const originalCharCount = getCharacterCount(originalText);
-  const originalWordCount = getWordCount(originalText);
-  const originalLineCount = getLineCount(originalText);
-
-  const editedCharCount = getCharacterCount(editedText);
-  const editedWordCount = getWordCount(editedText);
-  const editedLineCount = getLineCount(editedText);
+  const originalStats = getTextStats(originalText, charLimit);
+  const editedStats = getTextStats(editedText, charLimit);
 
   return (
     <div className="editor-container">
@@ -34,24 +27,15 @@ const Editor: React.FC<EditorProps> = ({
           <label className="editor-label">
             원본 자소서
           </label>
-          <div className="character-count">
-            <div className={`count-item ${originalCharCount > charLimit ? 'over-limit' : ''}`}>
-              <span className="count-label">글자수:</span>
-              <span className="count-value">
-                {originalCharCount.toLocaleString()}
-              </span>
-            </div>
-            <div className="count-item">
-              <span className="count-label">단어수:</span>
-              <span className="count-value">{originalWordCount.toLocaleString()}</span>
-            </div>
-            <div className="count-item">
-              <span className="count-label">줄수:</span>
-              <span className="count-value">{originalLineCount.toLocaleString()}</span>
-            </div>
-          </div>
+          <CharacterCount
+            characterCount={originalStats.characterCount}
+            wordCount={originalStats.wordCount}
+            lineCount={originalStats.lineCount}
+            charLimit={charLimit}
+            isOverLimit={originalStats.isOverLimit}
+          />
         </div>
-        <div className="editor-readonly">
+        <div className="editor-readonly" role="textbox" aria-label="원본 자소서">
           {originalText || <em>원본 텍스트가 없습니다.</em>}
         </div>
       </div>
@@ -61,32 +45,24 @@ const Editor: React.FC<EditorProps> = ({
           <label className="editor-label">
             자소서 수정
           </label>
-          <div className="character-count">
-            <div className={`count-item ${editedCharCount > charLimit ? 'over-limit' : ''}`}>
-              <span className="count-label">글자수:</span>
-              <span className="count-value">
-                {editedCharCount.toLocaleString()}
-              </span>
-            </div>
-            <div className="count-item">
-              <span className="count-label">단어수:</span>
-              <span className="count-value">{editedWordCount.toLocaleString()}</span>
-            </div>
-            <div className="count-item">
-              <span className="count-label">줄수:</span>
-              <span className="count-value">{editedLineCount.toLocaleString()}</span>
-            </div>
-          </div>
+          <CharacterCount
+            characterCount={editedStats.characterCount}
+            wordCount={editedStats.wordCount}
+            lineCount={editedStats.lineCount}
+            charLimit={charLimit}
+            isOverLimit={editedStats.isOverLimit}
+          />
         </div>
         <textarea
           className="editor-textarea"
           value={editedText}
           onChange={(e) => onEditedChange(e.target.value)}
           placeholder="수정된 자소서를 입력하세요..."
+          aria-label="자소서 수정 입력"
         />
       </div>
     </div>
   );
-};
+});
 
 export default Editor;

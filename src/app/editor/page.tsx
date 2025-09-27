@@ -1,22 +1,23 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import DiffViewer from '../../components/editor/DiffViewer';
 import Editor from '../../components/editor/Editor';
 import OriginalEditor from '../../components/editor/OriginalEditor';
 import { useSidebarStore } from '../../stores/sidebarStore';
+import { ViewMode, ShareData } from '../../types/editor';
+import { copyToClipboard, createShareUrl, generateShareId } from '../../utils/clipboardUtils';
+import { DEFAULT_CHAR_LIMIT, COPY_SUCCESS_DURATION, MOBILE_BREAKPOINT, MIN_CHAR_LIMIT, MAX_CHAR_LIMIT, CHAR_LIMIT_STEP } from '../../constants/editor';
 
 // 에디터 페이지는 독립적으로 렌더링
 export const dynamic = 'force-dynamic';
-
-type ViewMode = 'original' | 'edit' | 'result';
 
 export default function EditorPage() {
   const { isCollapsed } = useSidebarStore();
   const [originalText, setOriginalText] = useState<string>('');
   const [editedText, setEditedText] = useState<string>('');
   const [questionText, setQuestionText] = useState<string>('');
-  const [questionCharLimit, setQuestionCharLimit] = useState<number>(500);
+  const [questionCharLimit, setQuestionCharLimit] = useState<number>(DEFAULT_CHAR_LIMIT);
   const [viewMode, setViewMode] = useState<ViewMode>('original');
   const [shareId, setShareId] = useState<string>('');
   const [isHeaderVisible, setIsHeaderVisible] = useState<boolean>(true);
@@ -37,7 +38,7 @@ export default function EditorPage() {
         setOriginalText(original);
         setEditedText(edited);
         setQuestionText(question || '');
-        setQuestionCharLimit(questionLimit || 500);
+        setQuestionCharLimit(questionLimit || DEFAULT_CHAR_LIMIT);
         setViewMode('result');
         setShareId(sharedId);
       }
@@ -48,7 +49,7 @@ export default function EditorPage() {
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
-      const isMobile = window.innerWidth <= 768;
+      const isMobile = window.innerWidth <= MOBILE_BREAKPOINT;
       
       if (isMobile) {
         if (currentScrollY > lastScrollY && currentScrollY > 100) {
@@ -90,53 +91,43 @@ export default function EditorPage() {
     setViewMode(mode);
   };
 
-  const handleShare = (id: string) => {
+  const handleShare = useCallback((id: string) => {
     setShareId(id);
-  };
+  }, []);
 
-  const generateShareId = (): string => {
-    return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-  };
-
-  const handleShareClick = () => {
-    const shareId = generateShareId();
-    const shareData = {
-      original: originalText,
-      edited: editedText,
-      question: questionText,
-      questionLimit: questionCharLimit,
-      timestamp: new Date().toISOString()
-    };
-
-    // 로컬 스토리지에 데이터 저장
-    localStorage.setItem(`jaso_${shareId}`, JSON.stringify(shareData));
-
-    // 공유 URL 생성
-    const currentUrl = window.location.origin + window.location.pathname;
-    const url = `${currentUrl}?share=${shareId}`;
-    
-    setShareUrl(url);
-    setShareId(shareId);
-  };
-
-  const handleCopyUrl = async () => {
+  const handleShareClick = useCallback(() => {
     try {
-      await navigator.clipboard.writeText(shareUrl);
-      setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 2000);
-    } catch (err) {
-      console.error('URL 복사 실패:', err);
-      // 폴백: 텍스트 선택
-      const textArea = document.createElement('textarea');
-      textArea.value = shareUrl;
-      document.body.appendChild(textArea);
-      textArea.select();
-      document.execCommand('copy');
-      document.body.removeChild(textArea);
-      setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 2000);
+      const shareId = generateShareId();
+      const shareData: ShareData = {
+        original: originalText,
+        edited: editedText,
+        question: questionText,
+        questionLimit: questionCharLimit,
+        timestamp: new Date().toISOString()
+      };
+
+      // 로컬 스토리지에 데이터 저장
+      localStorage.setItem(`jaso_${shareId}`, JSON.stringify(shareData));
+
+      // 공유 URL 생성
+      const url = createShareUrl(shareId);
+      
+      setShareUrl(url);
+      setShareId(shareId);
+    } catch (error) {
+      console.error('공유 데이터 저장 실패:', error);
     }
-  };
+  }, [originalText, editedText, questionText, questionCharLimit]);
+
+  const handleCopyUrl = useCallback(async () => {
+    const result = await copyToClipboard(shareUrl);
+    if (result.success) {
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), COPY_SUCCESS_DURATION);
+    } else {
+      console.error('URL 복사 실패:', result.message);
+    }
+  }, [shareUrl]);
 
   return (
     <div className="App">
@@ -145,10 +136,14 @@ export default function EditorPage() {
           <img src="/logo_Bee_lsh_clear_gra.png" alt="로고" className="header-logo" />
           <h1>평비의 자소서 에디터</h1>
         </div>
-        <div className="mode-buttons">
+        <div className="mode-buttons" role="tablist" aria-label="에디터 모드 선택">
           <button 
             className={`mode-button ${viewMode === 'original' ? 'active' : ''}`}
             onClick={() => handleModeChange('original')}
+            role="tab"
+            aria-selected={viewMode === 'original'}
+            aria-controls="editor-content"
+            tabIndex={viewMode === 'original' ? 0 : -1}
           >
             <span className="button-text-full">원본 모드</span>
             <span className="button-text-mobile">원본</span>
@@ -156,6 +151,10 @@ export default function EditorPage() {
           <button 
             className={`mode-button ${viewMode === 'edit' ? 'active' : ''}`}
             onClick={() => handleModeChange('edit')}
+            role="tab"
+            aria-selected={viewMode === 'edit'}
+            aria-controls="editor-content"
+            tabIndex={viewMode === 'edit' ? 0 : -1}
           >
             <span className="button-text-full">수정 모드</span>
             <span className="button-text-mobile">수정</span>
@@ -163,6 +162,10 @@ export default function EditorPage() {
           <button 
             className={`mode-button ${viewMode === 'result' ? 'active' : ''}`}
             onClick={() => handleModeChange('result')}
+            role="tab"
+            aria-selected={viewMode === 'result'}
+            aria-controls="editor-content"
+            tabIndex={viewMode === 'result' ? 0 : -1}
           >
             <span className="button-text-full">결과 모드</span>
             <span className="button-text-mobile">결과</span>
@@ -171,6 +174,7 @@ export default function EditorPage() {
             className="mode-button"
             onClick={handleShareClick}
             title="공유하기"
+            aria-label="작성한 자소서 공유하기"
           >
             <span className="button-text-full">공유하기</span>
             <span className="button-text-mobile">공유</span>
@@ -197,10 +201,10 @@ export default function EditorPage() {
                 type="number"
                 className="question-limit-input"
                 value={questionCharLimit}
-                onChange={(e) => handleQuestionLimitChange(parseInt(e.target.value) || 500)}
-                min="100"
-                max="2000"
-                step="50"
+                onChange={(e) => handleQuestionLimitChange(parseInt(e.target.value) || DEFAULT_CHAR_LIMIT)}
+                min={MIN_CHAR_LIMIT}
+                max={MAX_CHAR_LIMIT}
+                step={CHAR_LIMIT_STEP}
               />
             </div>
           </div>
@@ -215,7 +219,7 @@ export default function EditorPage() {
         )}
       </div>
 
-      <main className="app-main">
+      <main className="app-main" id="editor-content" role="tabpanel" aria-label={`${viewMode} 모드 에디터`}>
         {viewMode === 'original' ? (
           <OriginalEditor
             originalText={originalText}

@@ -1,4 +1,6 @@
 import React from 'react';
+import { getTextStats } from '../../utils/textUtils';
+import CharacterCount from '../common/CharacterCount';
 
 interface OriginalEditorProps {
   originalText: string;
@@ -6,26 +8,12 @@ interface OriginalEditorProps {
   charLimit: number;
 }
 
-const OriginalEditor: React.FC<OriginalEditorProps> = ({
+const OriginalEditor: React.FC<OriginalEditorProps> = React.memo(({
   originalText,
   onOriginalChange,
   charLimit
 }) => {
-  const getCharacterCount = (text: string) => {
-    return text.length;
-  };
-
-  const getWordCount = (text: string) => {
-    return text.trim() ? text.trim().split(/\s+/).length : 0;
-  };
-
-  const getLineCount = (text: string) => {
-    return text ? text.split('\n').length : 0;
-  };
-
-  const characterCount = getCharacterCount(originalText);
-  const wordCount = getWordCount(originalText);
-  const lineCount = getLineCount(originalText);
+  const textStats = getTextStats(originalText, charLimit);
 
   return (
     <div className="original-editor-container">
@@ -34,32 +22,24 @@ const OriginalEditor: React.FC<OriginalEditorProps> = ({
           <label className="editor-label">
             원본 자소서
           </label>
-          <div className="character-count">
-            <div className={`count-item ${characterCount > charLimit ? 'over-limit' : ''}`}>
-              <span className="count-label">글자수:</span>
-              <span className="count-value">
-                {characterCount.toLocaleString()}
-              </span>
-            </div>
-            <div className="count-item">
-              <span className="count-label">단어수:</span>
-              <span className="count-value">{wordCount.toLocaleString()}</span>
-            </div>
-            <div className="count-item">
-              <span className="count-label">줄수:</span>
-              <span className="count-value">{lineCount.toLocaleString()}</span>
-            </div>
-          </div>
+          <CharacterCount
+            characterCount={textStats.characterCount}
+            wordCount={textStats.wordCount}
+            lineCount={textStats.lineCount}
+            charLimit={charLimit}
+            isOverLimit={textStats.isOverLimit}
+          />
         </div>
         <textarea
           className="editor-textarea"
           value={originalText}
           onChange={(e) => onOriginalChange(e.target.value)}
           placeholder="자소서 원본을 입력하세요..."
+          aria-label="자소서 원본 입력"
         />
       </div>
     </div>
   );
-};
+});
 
 export default OriginalEditor;
