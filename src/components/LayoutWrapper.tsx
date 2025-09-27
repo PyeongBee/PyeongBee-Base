@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Sidebar from '../../components/Sidebar';
-import MobileNavigation from '../../components/MobileNavigation';
-import { useSidebarStore } from '../../stores/sidebarStore';
+import Sidebar from './Sidebar';
+import MobileNavigation from './MobileNavigation';
+import { useSidebarStore } from '../stores/sidebarStore';
 
 interface LayoutWrapperProps {
   children: React.ReactNode;

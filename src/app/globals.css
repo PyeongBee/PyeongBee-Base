@@ -24,3 +24,966 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* 자소서 에디터 스타일 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f5f5f5;
+}
+
+/* 에디터 페이지 스타일 */
+.editor-page .App {
+  height: 100vh;
+  overflow: hidden;
+}
+
+.App {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-header {
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  color: white;
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  transition: transform 0.3s ease-in-out;
+}
+
+/* 에디터 페이지에서 헤더가 사이드바와 겹치지 않도록 조정 */
+.editor-page .app-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+/* 사이드바 상태에 따른 헤더 위치 조정 */
+.editor-page .app-header.sidebar-collapsed {
+  left: 64px; /* 접힌 사이드바 너비 */
+  transition: left 0.3s ease-in-out;
+}
+
+.editor-page .app-header.sidebar-expanded {
+  left: 256px; /* 펼쳐진 사이드바 너비 */
+  transition: left 0.3s ease-in-out;
+}
+
+/* 모바일에서는 사이드바가 없으므로 전체 너비 사용 */
+@media (max-width: 768px) {
+  .editor-page .app-header.sidebar-collapsed,
+  .editor-page .app-header.sidebar-expanded {
+    left: 0;
+  }
+}
+
+.header-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.header-logo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+.app-header h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+}
+
+.header-hidden {
+  transform: translateY(-100%);
+}
+
+.mode-buttons {
+  display: flex;
+  gap: 1rem;
+}
+
+.mode-button {
+  padding: 0.75rem 1.5rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  background: transparent;
+  color: white;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.button-text-mobile {
+  display: none;
+}
+
+.mode-button:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.mode-button.active {
+  background: #92400e;
+  color: white;
+  border-color: #92400e;
+}
+
+/* 문항 섹션 */
+.question-section {
+  padding: 1rem 4rem;
+  background: #f8f9fa;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.question-editor {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.question-display {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.question-input-group {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex: 1;
+  min-width: 300px;
+}
+
+.question-limit-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.question-count {
+  display: flex;
+  align-items: center;
+}
+
+.question-label {
+  font-weight: 600;
+  color: #333;
+  font-size: 0.9rem;
+  min-width: 50px;
+}
+
+.question-limit-label {
+  font-weight: 500;
+  color: #666;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+.question-input {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  transition: border-color 0.3s ease;
+}
+
+.question-input:focus {
+  outline: none;
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+}
+
+.question-limit-input {
+  width: 80px;
+  padding: 0.4rem 0.6rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  text-align: center;
+  transition: border-color 0.3s ease;
+}
+
+.question-limit-input:focus {
+  outline: none;
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+}
+
+.question-count-text {
+  font-size: 0.8rem;
+  color: #f59e0b;
+  font-weight: 500;
+  padding: 0.3rem 0.8rem;
+  background: rgba(245, 158, 11, 0.1);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.question-count-text.over-limit {
+  color: #f44336;
+  background: rgba(244, 67, 54, 0.1);
+}
+
+.question-text {
+  flex: 1;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.question-count-display {
+  font-size: 0.8rem;
+  color: #f59e0b;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.question-count-display.over-limit {
+  color: #f44336;
+}
+
+.app-main {
+  flex: 1;
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+  overflow-y: auto;
+}
+
+/* 에디터 페이지에서 메인 컨텐츠 조정 */
+.editor-page .app-main {
+  margin: 0 auto;
+  max-width: 1400px;
+  width: 100%;
+  padding: 80px 2rem 2rem 2rem; /* 헤더 높이만큼 상단 패딩 추가 */
+}
+
+/* 에디터 스타일 */
+.editor-container {
+  display: flex;
+  gap: 2rem;
+  height: 70vh;
+  min-height: 500px;
+  width: 100%;
+  max-width: 100%;
+}
+
+.original-editor-container {
+  display: flex;
+  justify-content: center;
+  height: 70vh;
+  min-height: 500px;
+  width: 100%;
+  max-width: 100%;
+}
+
+.editor-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* flex 아이템이 축소될 수 있도록 */
+}
+
+.original-editor-container .editor-section {
+  max-width: 800px;
+  width: 100%;
+  margin: 0 auto; /* 가운데 정렬 */
+}
+
+.editor-label {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.editor-label::before {
+  content: '';
+  width: 4px;
+  height: 20px;
+  background: #f59e0b;
+  border-radius: 2px;
+}
+
+.editor-textarea {
+  flex: 1;
+  padding: 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  resize: none;
+  font-family: inherit;
+  transition: border-color 0.3s ease;
+}
+
+.editor-textarea:focus {
+  outline: none;
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
+}
+
+.editor-readonly {
+  flex: 1;
+  padding: 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  font-family: inherit;
+  background-color: #f8f8f8;
+  color: #666;
+  white-space: pre-wrap;
+  overflow-y: auto;
+}
+
+/* 원본 에디터 헤더 스타일 */
+.editor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.character-count {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.count-item {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: rgba(230, 165, 91, 0.26);
+  padding: 0.25rem 0.75rem;
+  border-radius: 15px;
+  font-size: 0.9rem;
+}
+
+.count-label {
+  color: #666;
+  font-weight: 500;
+}
+
+.count-value {
+  color: #92400e;
+  font-weight: 600;
+}
+
+.count-item.over-limit {
+  background: rgba(244, 67, 54, 0.15);
+  border: 1px solid rgba(244, 67, 54, 0.3);
+}
+
+.count-item.over-limit .count-label {
+  color: #f44336;
+}
+
+.count-item.over-limit .count-value {
+  color: #f44336;
+}
+
+/* 복사 버튼 스타일 */
+.copy-result-button {
+  width: 32px;
+  height: 32px;
+  background: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.copy-result-button:hover {
+  background: #e9ecef;
+  border-color: #f59e0b;
+  transform: scale(1.05);
+}
+
+.copy-result-button:active {
+  transform: scale(0.95);
+}
+
+.copy-result-button.copy-success {
+  background: #4caf50;
+  border-color: #4caf50;
+  color: white;
+}
+
+/* Diff 뷰어 스타일 */
+.diff-container {
+  display: flex;
+  gap: 2rem;
+  height: 70vh;
+  min-height: 500px;
+  width: 100%;
+  max-width: 100%;
+}
+
+.diff-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* flex 아이템이 축소될 수 있도록 */
+}
+
+.diff-content {
+  flex: 1;
+  padding: 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background: white;
+  overflow-y: auto;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  font-family: inherit;
+  transition: border-color 0.3s ease;
+}
+
+.diff-content h3 {
+  margin: 0;
+  color: #333;
+  font-size: 1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.diff-content h3::before {
+  content: '';
+  width: 4px;
+  height: 20px;
+  background: #f59e0b;
+  border-radius: 2px;
+}
+
+/* Diff 하이라이팅 */
+.diff-original {
+  background: #fafafa;
+  border: 1px solid #e0e0e0;
+}
+
+.diff-changes {
+  background: white;
+  border: 1px solid #e0e0e0;
+}
+
+.diff-final {
+  background: #f8f8f8;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1rem;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  color: #666;
+  font-family: inherit;
+}
+
+.diff-line {
+  display: flex;
+  align-items: flex-start;
+  min-height: 1.5em;
+  line-height: 1.5;
+  font-family: 'Courier New', monospace;
+  font-size: 0.95rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.diff-line:last-child {
+  border-bottom: none;
+}
+
+.line-number {
+  width: 40px;
+  text-align: right;
+  font-weight: bold;
+  flex-shrink: 0;
+  padding: 0 8px;
+  border-right: 1px solid #e0e0e0;
+  margin-right: 8px;
+  color: #666;
+  background: #f8f8f8;
+}
+
+.diff-marker {
+  width: 20px;
+  text-align: center;
+  font-weight: bold;
+  flex-shrink: 0;
+  padding: 0 4px;
+  border-right: 1px solid #e0e0e0;
+  margin-right: 8px;
+}
+
+.diff-content {
+  flex: 1;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  padding: 2px 0;
+}
+
+.diff-removed {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.diff-removed .diff-marker {
+  background-color: #ffcdd2;
+  color: #d32f2f;
+}
+
+.diff-removed .line-number {
+  background-color: #ffcdd2;
+  color: #d32f2f;
+}
+
+.diff-added {
+  background-color: #e8f5e8;
+  color: #2e7d32;
+}
+
+.diff-added .diff-marker {
+  background-color: #c8e6c9;
+  color: #388e3c;
+}
+
+.diff-added .line-number {
+  background-color: #c8e6c9;
+  color: #388e3c;
+}
+
+.diff-unchanged {
+  background-color: transparent;
+  color: #333;
+}
+
+.diff-unchanged .diff-marker {
+  background-color: #f5f5f5;
+  color: #666;
+}
+
+.diff-original-line {
+  background-color: #fafafa;
+  color: #333;
+}
+
+.diff-original-line .line-number {
+  background-color: #e8e8e8;
+  color: #666;
+}
+
+/* 단어 단위 diff 스타일 */
+.diff-removed-word {
+  background-color: #ffebee;
+  color: #c62828;
+  text-decoration: line-through;
+  padding: 1px 2px;
+  border-radius: 2px;
+}
+
+.diff-added-word {
+  background-color: #e8f5e8;
+  color: #2e7d32;
+  padding: 1px 2px;
+  border-radius: 2px;
+}
+
+.diff-unchanged-word {
+  color: #333;
+}
+
+/* 공유 모달 스타일 */
+.share-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.share-modal {
+  background: white;
+  border-radius: 12px;
+  padding: 0;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.share-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 1.5rem 0 1.5rem;
+  border-bottom: 1px solid #e0e0e0;
+  margin-bottom: 1.5rem;
+}
+
+.share-modal-header h3 {
+  margin: 0;
+  color: #333;
+  font-size: 1.2rem;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #666;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.close-button:hover {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.share-modal-content {
+  padding: 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.share-url-input {
+  padding: 0.75rem 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background: #f8f9fa;
+  font-family: monospace;
+  font-size: 0.9rem;
+  color: #666;
+  word-break: break-all;
+}
+
+.copy-button {
+  padding: 0.75rem 1.5rem;
+  background: #fbbf24;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: background 0.3s ease;
+}
+
+.copy-button:hover {
+  background: #92400e;
+}
+
+.copy-success {
+  background: #4caf50 !important;
+}
+
+.share-modal-footer {
+  padding: 1rem 1.5rem 1.5rem 1.5rem;
+  margin: 0;
+  color: #666;
+  font-size: 0.9rem;
+  text-align: center;
+  border-top: 1px solid #e0e0e0;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 768px) {
+  body {
+    padding-top: 70px;
+  }
+  
+  .app-header {
+    padding: 0.75rem 1rem;
+    flex-direction: row;
+    gap: 0.5rem;
+  }
+  
+  .header-logo {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .app-header h1 {
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+  
+  .mode-buttons {
+    gap: 0.5rem;
+    flex-shrink: 1;
+  }
+  
+  .mode-button {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8rem;
+  }
+  
+  .button-text-full {
+    display: none;
+  }
+  
+  .button-text-mobile {
+    display: inline;
+  }
+  
+  .question-section {
+    padding: 1rem;
+  }
+  
+  .question-editor {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+  
+  .question-input-group {
+    min-width: auto;
+  }
+  
+  .question-limit-group {
+    justify-content: center;
+  }
+  
+  .app-main {
+    padding: 1rem;
+  }
+  
+  .editor-container,
+  .diff-container,
+  .original-editor-container {
+    flex-direction: column;
+    height: auto;
+    min-height: auto;
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  .editor-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .character-count {
+    justify-content: center;
+    width: 100%;
+  }
+  
+  .count-item {
+    padding: 0.2rem 0.5rem;
+    font-size: 0.7rem;
+  }
+  
+  .count-label {
+    font-size: 0.7rem;
+  }
+  
+  .count-value {
+    font-size: 0.7rem;
+  }
+  
+  .header-right {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .copy-result-button {
+    width: 28px;
+    height: 28px;
+    font-size: 0.8rem;
+  }
+  
+  .editor-textarea,
+  .diff-content {
+    min-height: 300px;
+    font-size: 0.8rem;
+  }
+  
+  .editor-readonly {
+    font-size: 0.8rem;
+  }
+  
+  .diff-line {
+    font-size: 0.8rem;
+  }
+  
+  .diff-removed-word,
+  .diff-added-word,
+  .diff-unchanged-word {
+    font-size: 0.8rem;
+  }
+  
+  .mode-buttons {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .share-modal {
+    width: 95%;
+    margin: 1rem;
+  }
+}
+
+/* 스크롤바 스타일 */
+.editor-textarea::-webkit-scrollbar,
+.diff-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.editor-textarea::-webkit-scrollbar-track,
+.diff-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.editor-textarea::-webkit-scrollbar-thumb,
+.diff-content::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.editor-textarea::-webkit-scrollbar-thumb:hover,
+.diff-content::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* 사이드바 개선 스타일 */
+.sidebar-menu-item {
+  transition: all 0.2s ease-in-out;
+}
+
+.sidebar-menu-item:hover {
+  transform: translateX(2px);
+}
+
+/* 사이드바 로고 영역 개선 */
+.sidebar-logo {
+  transition: all 0.3s ease-in-out;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+}
+
+.sidebar-logo:hover {
+  background-color: rgba(59, 130, 246, 0.05);
+}
+
+/* 로고 아이콘 개선 */
+.sidebar-logo .logo-icon {
+  transition: all 0.2s ease-in-out;
+}
+
+.sidebar-logo:hover .logo-icon {
+  transform: scale(1.05);
+}
+
+/* 로고 텍스트 개선 */
+.sidebar-logo .logo-text {
+  transition: all 0.2s ease-in-out;
+  font-weight: 600;
+}
+
+.sidebar-logo:hover .logo-text {
+  color: #3b82f6;
+}
+
+/* 사이드바 메뉴 아이템 간격 개선 */
+.sidebar-nav {
+  padding: 0.75rem;
+}
+
+.sidebar-nav.collapsed {
+  padding: 0.5rem;
+}
+
+/* 사이드바 메뉴 아이템 활성 상태 */
+.sidebar-menu-item.active {
+  background-color: #f3f4f6;
+  border-left: 3px solid #3b82f6;
+}
+
+.sidebar-menu-item.active.dark {
+  background-color: #374151;
+  border-left: 3px solid #60a5fa;
+}

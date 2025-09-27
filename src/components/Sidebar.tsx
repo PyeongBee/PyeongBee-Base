@@ -27,17 +27,19 @@ export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
       isCollapsed ? 'w-16' : 'w-64'
     }`}>
       {/* 로고 영역 */}
-      <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+      <div className={`border-b border-gray-200 dark:border-gray-700 sidebar-logo ${
+        isCollapsed ? 'py-4 px-3' : 'py-5 px-4'
+      }`}>
         <div className="flex items-center justify-center">
           {!isCollapsed ? (
-            <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+            <div className="flex items-center space-x-3">
+              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-sm logo-icon">
                 <span className="text-white font-bold text-sm">P</span>
               </div>
-              <span className="font-semibold text-gray-900 dark:text-white">PyeongBee</span>
+              <span className="font-semibold text-gray-900 dark:text-white text-base logo-text">PyeongBee</span>
             </div>
           ) : (
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-sm logo-icon">
               <span className="text-white font-bold text-sm">P</span>
             </div>
           )}
@@ -45,17 +47,19 @@ export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
       </div>
 
       {/* 메뉴 영역 */}
-      <nav className="flex-1 p-4 space-y-2">
+      <nav className={`flex-1 space-y-1 sidebar-nav ${
+        isCollapsed ? 'p-2 collapsed' : 'p-3'
+      }`}>
         {menuItems.map((item, index) => {
           const IconComponent = item.icon;
           return (
             <a
               key={index}
               href={item.href}
-              className={`flex items-center rounded-lg transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-800 hover:scale-105 h-9 ${
+              className={`flex items-center rounded-lg transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-800 hover:scale-105 sidebar-menu-item ${
                 isCollapsed 
-                  ? 'justify-center px-3' 
-                  : 'px-3'
+                  ? 'justify-center h-10 px-2' 
+                  : 'h-10 px-3'
               }`}
               title={isCollapsed ? item.label : undefined}
             >
