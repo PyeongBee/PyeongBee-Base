@@ -8,6 +8,7 @@ import { useSidebarStore } from '../../stores/sidebarStore';
 import { ViewMode, ShareData } from '../../types/editor';
 import { copyToClipboard, createShareUrl, generateShareId } from '../../utils/clipboardUtils';
 import { DEFAULT_CHAR_LIMIT, COPY_SUCCESS_DURATION, MOBILE_BREAKPOINT, MIN_CHAR_LIMIT, MAX_CHAR_LIMIT, CHAR_LIMIT_STEP } from '../../constants/editor';
+import { ModeButton, Button } from '../../components/common/CharacterCount';
 
 // 에디터 페이지는 독립적으로 렌더링
 export const dynamic = 'force-dynamic';
@@ -130,76 +131,89 @@ export default function EditorPage() {
   }, [shareUrl]);
 
   return (
-    <div className="App">
-      <header className={`app-header ${!isHeaderVisible ? 'header-hidden' : ''} ${isCollapsed ? 'sidebar-collapsed' : 'sidebar-expanded'}`}>
-        <div className="header-title">
-          <img src="/logo_Bee_lsh_clear_gra.png" alt="로고" className="header-logo" />
-          <h1>평비의 자소서 에디터</h1>
+    <div className="min-h-screen flex flex-col">
+      <header className={`
+        fixed top-0 right-0 z-[1000] 
+        bg-gradient-to-br from-brand-primary to-brand-secondary text-white
+        px-8 py-4 shadow-lg
+        flex justify-between items-center
+        transition-transform duration-300 ease-in-out
+        ${!isHeaderVisible ? '-translate-y-full' : 'translate-y-0'}
+        ${isCollapsed ? 'left-16' : 'left-64'}
+        md:left-0
+      `}>
+        <div className="flex items-center gap-3 flex-1 min-w-0">
+          <img src="/logo_Bee_lsh_clear_gra.png" alt="로고" className="w-12 h-12 object-contain" />
+          <h1 className="text-2xl font-semibold truncate">평비의 자소서 에디터</h1>
         </div>
-        <div className="mode-buttons" role="tablist" aria-label="에디터 모드 선택">
-          <button 
-            className={`mode-button ${viewMode === 'original' ? 'active' : ''}`}
+        <div className="flex gap-4" role="tablist" aria-label="에디터 모드 선택">
+          <ModeButton
+            active={viewMode === 'original'}
             onClick={() => handleModeChange('original')}
             role="tab"
             aria-selected={viewMode === 'original'}
             aria-controls="editor-content"
             tabIndex={viewMode === 'original' ? 0 : -1}
           >
-            <span className="button-text-full">원본 모드</span>
-            <span className="button-text-mobile">원본</span>
-          </button>
-          <button 
-            className={`mode-button ${viewMode === 'edit' ? 'active' : ''}`}
+            <span className="hidden sm:inline">원본 모드</span>
+            <span className="sm:hidden">원본</span>
+          </ModeButton>
+          <ModeButton
+            active={viewMode === 'edit'}
             onClick={() => handleModeChange('edit')}
             role="tab"
             aria-selected={viewMode === 'edit'}
             aria-controls="editor-content"
             tabIndex={viewMode === 'edit' ? 0 : -1}
           >
-            <span className="button-text-full">수정 모드</span>
-            <span className="button-text-mobile">수정</span>
-          </button>
-          <button 
-            className={`mode-button ${viewMode === 'result' ? 'active' : ''}`}
+            <span className="hidden sm:inline">수정 모드</span>
+            <span className="sm:hidden">수정</span>
+          </ModeButton>
+          <ModeButton
+            active={viewMode === 'result'}
             onClick={() => handleModeChange('result')}
             role="tab"
             aria-selected={viewMode === 'result'}
             aria-controls="editor-content"
             tabIndex={viewMode === 'result' ? 0 : -1}
           >
-            <span className="button-text-full">결과 모드</span>
-            <span className="button-text-mobile">결과</span>
-          </button>
-          <button 
-            className="mode-button"
+            <span className="hidden sm:inline">결과 모드</span>
+            <span className="sm:hidden">결과</span>
+          </ModeButton>
+          <Button
+            variant="ghost"
             onClick={handleShareClick}
-            title="공유하기"
+            className="border-2 border-white/30 hover:border-white/50 text-white hover:bg-white/10"
             aria-label="작성한 자소서 공유하기"
           >
-            <span className="button-text-full">공유하기</span>
-            <span className="button-text-mobile">공유</span>
-          </button>
+            <span className="hidden sm:inline">공유하기</span>
+            <span className="sm:hidden">공유</span>
+          </Button>
         </div>
       </header>
 
-      <div className="question-section">
+      <div className="mt-20 px-16 py-4 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         {viewMode === 'original' ? (
-          <div className="question-editor">
-            <div className="question-input-group">
-              <label className="question-label">문항</label>
+          <div className="flex items-center gap-8 flex-wrap">
+            <div className="flex items-center gap-4 flex-1 min-w-[300px]">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">문항</label>
               <input
                 type="text"
-                className="question-input"
+                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm 
+                         focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
+                         dark:bg-gray-700 dark:text-white"
                 value={questionText}
                 onChange={(e) => handleQuestionChange(e.target.value)}
                 placeholder="자소서 문항을 입력하세요..."
               />
             </div>
-            <div className="question-limit-group">
-              <label className="question-limit-label">글자수 제한</label>
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">글자수 제한</label>
               <input
                 type="number"
-                className="question-limit-input"
+                className="w-20 px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm 
+                         focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
+                         dark:bg-gray-700 dark:text-white text-center"
                 value={questionCharLimit}
                 onChange={(e) => handleQuestionLimitChange(parseInt(e.target.value) || DEFAULT_CHAR_LIMIT)}
                 min={MIN_CHAR_LIMIT}
@@ -209,17 +223,17 @@ export default function EditorPage() {
             </div>
           </div>
         ) : (
-          <div className="question-display">
-            <span className="question-label">문항</span>
-            <span className="question-text">{questionText || '문항이 입력되지 않았습니다.'}</span>
-            <span className="question-count-display">
+          <div className="flex items-center gap-4 flex-wrap">
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">문항</span>
+            <span className="text-gray-900 dark:text-white">{questionText || '문항이 입력되지 않았습니다.'}</span>
+            <span className="text-sm text-gray-500 dark:text-gray-400">
               (제한: {questionCharLimit}자)
             </span>
           </div>
         )}
       </div>
 
-      <main className="app-main" id="editor-content" role="tabpanel" aria-label={`${viewMode} 모드 에디터`}>
+      <main className="flex-1 p-6" id="editor-content" role="tabpanel" aria-label={`${viewMode} 모드 에디터`}>
         {viewMode === 'original' ? (
           <OriginalEditor
             originalText={originalText}
@@ -245,27 +259,41 @@ export default function EditorPage() {
 
       {/* 공유 URL 모달 */}
       {shareUrl && (
-        <div className="share-modal-overlay" onClick={() => setShareUrl('')}>
-          <div className="share-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="share-modal-header">
-              <h3>공유 링크</h3>
-              <button className="close-button" onClick={() => setShareUrl('')}>×</button>
+        <div 
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-[1100] p-4"
+          onClick={() => setShareUrl('')}
+        >
+          <div 
+            className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">공유 링크</h3>
+              <button 
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 text-2xl leading-none"
+                onClick={() => setShareUrl('')}
+                aria-label="모달 닫기"
+              >
+                ×
+              </button>
             </div>
-            <div className="share-modal-content">
+            <div className="flex gap-2 mb-4">
               <input
                 type="text"
                 value={shareUrl}
                 readOnly
-                className="share-url-input"
+                className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md 
+                         bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
               />
-              <button
-                className={`copy-button ${isCopied ? 'copy-success' : ''}`}
+              <Button
+                variant={isCopied ? 'secondary' : 'primary'}
                 onClick={handleCopyUrl}
+                className="whitespace-nowrap"
               >
                 {isCopied ? '✓ 복사됨' : '📋 복사'}
-              </button>
+              </Button>
             </div>
-            <p className="share-modal-footer">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
               링크를 복사하여 다른 사람과 공유하세요!
             </p>
           </div>

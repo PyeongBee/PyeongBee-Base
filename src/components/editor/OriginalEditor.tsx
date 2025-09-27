@@ -16,10 +16,10 @@ const OriginalEditor: React.FC<OriginalEditorProps> = React.memo(({
   const textStats = getTextStats(originalText, charLimit);
 
   return (
-    <div className="original-editor-container">
-      <div className="editor-section">
-        <div className="editor-header">
-          <label className="editor-label">
+    <div className="max-w-4xl mx-auto">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+        <div className="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
+          <label className="text-lg font-semibold text-gray-900 dark:text-white">
             원본 자소서
           </label>
           <CharacterCount
@@ -31,7 +31,8 @@ const OriginalEditor: React.FC<OriginalEditorProps> = React.memo(({
           />
         </div>
         <textarea
-          className="editor-textarea"
+          className="w-full h-96 p-4 border-0 resize-none focus:outline-none focus:ring-0 
+                   bg-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
           value={originalText}
           onChange={(e) => onOriginalChange(e.target.value)}
           placeholder="자소서 원본을 입력하세요..."
