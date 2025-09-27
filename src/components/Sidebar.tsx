@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { 
   FileText, 
   Share2, 
@@ -27,9 +28,7 @@ export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
       isCollapsed ? 'w-16' : 'w-64'
     }`}>
       {/* 로고 영역 */}
-      <div className={`border-b border-gray-200 dark:border-gray-700 sidebar-logo ${
-        isCollapsed ? 'py-4 px-3' : 'py-5 px-4'
-      }`}>
+      <div className={`border-b border-gray-200 dark:border-gray-700 sidebar-logo py-5 px-4`}>
         <div className="flex items-center justify-center">
           {!isCollapsed ? (
             <div className="flex items-center space-x-3">
@@ -48,12 +47,12 @@ export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
 
       {/* 메뉴 영역 */}
       <nav className={`flex-1 space-y-1 sidebar-nav ${
-        isCollapsed ? 'p-2 collapsed' : 'p-3'
+        isCollapsed ? 'p-3 collapsed' : 'p-3'
       }`}>
         {menuItems.map((item, index) => {
           const IconComponent = item.icon;
           return (
-            <a
+            <Link
               key={index}
               href={item.href}
               className={`flex items-center rounded-lg transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-800 hover:scale-105 sidebar-menu-item ${
@@ -69,7 +68,7 @@ export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
               {!isCollapsed && (
                 <span className="text-gray-700 dark:text-gray-300 whitespace-nowrap ml-3 text-sm leading-5">{item.label}</span>
               )}
-            </a>
+            </Link>
           );
         })}
       </nav>

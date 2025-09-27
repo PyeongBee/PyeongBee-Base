@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { 
   FileText, 
   Share2, 
@@ -53,7 +54,7 @@ export default function MobileNavigation() {
           const IconComponent = item.icon;
           return (
             <div key={index} className="relative">
-              <a
+              <Link
                 href={item.href}
                 className="flex items-center justify-center w-12 h-12 rounded-lg transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-800 hover:scale-105 active:scale-95"
                 onMouseEnter={() => handleMouseEnter(index)}
@@ -62,7 +63,7 @@ export default function MobileNavigation() {
                 onTouchEnd={handleTouchEnd}
               >
                 <IconComponent className="w-6 h-6 text-gray-600 dark:text-gray-400" />
-              </a>
+              </Link>
               
               {/* 툴팁 */}
               {hoveredItem === index && (
