@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import Sidebar from './Sidebar';
-import MobileNavigation from './MobileNavigation';
-import { useSidebarStore } from '../stores/sidebarStore';
-import { MOBILE_BREAKPOINT } from '../constants/editor';
+import { useState, useEffect } from "react";
+import Sidebar from "./Sidebar";
+import MobileNavigation from "./MobileNavigation";
+import { useSidebarStore } from "../stores/sidebarStore";
+import { MOBILE_BREAKPOINT } from "../constants/editor";
 
 interface LayoutWrapperProps {
   children: React.ReactNode;
@@ -17,15 +17,15 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
 
   useEffect(() => {
     setIsClient(true);
-    
+
     const checkMobile = () => {
       setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
     };
-    
+
     checkMobile();
-    window.addEventListener('resize', checkMobile);
-    
-    return () => window.removeEventListener('resize', checkMobile);
+    window.addEventListener("resize", checkMobile);
+
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   return (
@@ -39,18 +39,22 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
 
       {/* 메인 컨텐츠 영역 */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        <main className={`flex-1 overflow-auto ${
-          isMobile 
-            ? 'pb-16' // 모바일에서는 하단 네비게이션 공간 확보
-            : ''
-        }`}>
-          <div className={`mx-auto ${
-            isMobile 
-              ? 'w-full px-4' 
-              : isCollapsed 
-                ? 'w-full max-w-4xl px-6' 
-                : 'w-full max-w-4xl px-6'
-          }`}>
+        <main
+          className={`flex-1 overflow-auto ${
+            isMobile
+              ? "pb-16" // 모바일에서는 하단 네비게이션 공간 확보
+              : ""
+          }`}
+        >
+          <div
+            className={`mx-auto ${
+              isMobile
+                ? "w-full px-4"
+                : isCollapsed
+                ? "w-full px-6"
+                : "w-full px-6"
+            }`}
+          >
             {children}
           </div>
         </main>

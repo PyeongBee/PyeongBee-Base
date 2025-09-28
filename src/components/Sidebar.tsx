@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { 
-  FileText, 
-  Share2, 
-  User, 
+import Link from "next/link";
+import {
+  FileText,
+  Share2,
+  User,
   MoreHorizontal,
   ChevronLeft,
-  ChevronRight
-} from 'lucide-react';
+  ChevronRight,
+} from "lucide-react";
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -17,38 +17,50 @@ interface SidebarProps {
 
 export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
   const menuItems = [
-    { icon: FileText, label: '자소서 에디터', href: '/editor' },
-    { icon: Share2, label: '프로젝트 공유', href: '/share' },
-    { icon: User, label: '프로필', href: '/profile' },
-    { icon: MoreHorizontal, label: '더 보기', href: '/more' },
+    { icon: FileText, label: "자소서 에디터", href: "/editor" },
+    { icon: Share2, label: "프로젝트 공유", href: "/share" },
+    { icon: User, label: "프로필", href: "/profile" },
+    { icon: MoreHorizontal, label: "더 보기", href: "/more" },
   ];
 
   return (
-    <div className={`bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 transition-all duration-300 relative h-full flex flex-col ${
-      isCollapsed ? 'w-16' : 'w-64'
-    }`}>
+    <div
+      className={`bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 transition-all duration-300 relative h-full flex flex-col ${
+        isCollapsed ? "w-16" : "w-64"
+      }`}
+    >
       {/* 로고 영역 */}
-      <div className={`border-b border-gray-200 dark:border-gray-700 sidebar-logo py-5 px-4`}>
+      <div
+        className={`border-b border-gray-200 dark:border-gray-700 sidebar-logo py-1 px-2`}
+      >
         <div className="flex items-center justify-center">
           {!isCollapsed ? (
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-sm logo-icon">
-                <span className="text-white font-bold text-sm">P</span>
-              </div>
-              <span className="font-semibold text-gray-900 dark:text-white text-base logo-text">PyeongBee</span>
+              <img
+                src="/logo_Bee_lsh_clear_gra.png"
+                alt="로고"
+                className="w-12 h-12 object-contain"
+              />
+              <span className="font-semibold text-gray-900 dark:text-white text-base logo-text">
+                평비의 Honey Pot
+              </span>
             </div>
           ) : (
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-sm logo-icon">
-              <span className="text-white font-bold text-sm">P</span>
-            </div>
+            <img
+              src="/logo_Bee_lsh_clear_gra.png"
+              alt="로고"
+              className="w-12 h-12 object-contain"
+            />
           )}
         </div>
       </div>
 
       {/* 메뉴 영역 */}
-      <nav className={`flex-1 space-y-1 sidebar-nav ${
-        isCollapsed ? 'p-3 collapsed' : 'p-3'
-      }`}>
+      <nav
+        className={`flex-1 space-y-1 sidebar-nav ${
+          isCollapsed ? "p-3 collapsed" : "p-3"
+        }`}
+      >
         {menuItems.map((item, index) => {
           const IconComponent = item.icon;
           return (
@@ -56,9 +68,7 @@ export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
               key={index}
               href={item.href}
               className={`flex items-center rounded-lg transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-800 hover:scale-105 sidebar-menu-item ${
-                isCollapsed 
-                  ? 'justify-center h-10 px-2' 
-                  : 'h-10 px-3'
+                isCollapsed ? "justify-center h-10 px-2" : "h-10 px-3"
               }`}
               title={isCollapsed ? item.label : undefined}
             >
@@ -66,7 +76,9 @@ export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
                 <IconComponent className="w-5 h-5 text-gray-600 dark:text-gray-400" />
               </div>
               {!isCollapsed && (
-                <span className="text-gray-700 dark:text-gray-300 whitespace-nowrap ml-3 text-sm leading-5">{item.label}</span>
+                <span className="text-gray-700 dark:text-gray-300 whitespace-nowrap ml-3 text-sm leading-5">
+                  {item.label}
+                </span>
               )}
             </Link>
           );
