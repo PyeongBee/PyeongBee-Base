@@ -4,6 +4,7 @@ import { getTextStats } from "../../utils/textUtils";
 import { copyToClipboard } from "../../utils/clipboardUtils";
 import { COPY_SUCCESS_DURATION } from "../../constants/editor";
 import CharacterCount from "../common/CharacterCount";
+import ToggleSwitch from "../common/ToggleSwitch";
 
 interface DiffViewerProps {
   originalText: string;
@@ -140,51 +141,44 @@ const DiffViewer: React.FC<DiffViewerProps> = React.memo(
     };
 
     return (
-      <div className="max-w-4xl mx-auto">
+      <div className="w-full">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
-          <div className="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex justify-between items-center px-4 py-4 border-b border-gray-200 dark:border-gray-700">
+            <label className="text-lg font-semibold text-gray-900 dark:text-white">
+              최종 결과
+            </label>
             <div className="flex items-center gap-4">
-              <label className="text-lg font-semibold text-gray-900 dark:text-white">
-                {viewMode === "diff" ? "변경사항" : "최종 결과"}
-              </label>
-              <div className="flex bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
+              <ToggleSwitch
+                checked={viewMode === "diff"}
+                onChange={(checked) => setViewMode(checked ? "diff" : "final")}
+                label="변경사항 보기"
+                size="md"
+              />
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-600 dark:text-gray-400">
+                  내용 복사
+                </span>
                 <button
-                  onClick={() => setViewMode("diff")}
-                  className={`px-3 py-1 text-sm rounded-md transition-colors duration-200 ${
-                    viewMode === "diff"
-                      ? "bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm"
-                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
-                  }`}
+                  className={`
+                    w-8 h-8 flex items-center justify-center text-xs rounded transition-all duration-200
+                    ${
+                      isCopied
+                        ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"
+                        : "bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-300"
+                    }
+                    focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1
+                  `}
+                  onClick={handleCopyResult}
+                  title={isCopied ? "복사됨!" : "내용 복사"}
+                  aria-label={isCopied ? "복사됨!" : "내용 복사"}
                 >
-                  변경사항 보기
-                </button>
-                <button
-                  onClick={() => setViewMode("final")}
-                  className={`px-3 py-1 text-sm rounded-md transition-colors duration-200 ${
-                    viewMode === "final"
-                      ? "bg-white dark:bg-gray-600 text-gray-900 dark:text-white shadow-sm"
-                      : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
-                  }`}
-                >
-                  최종 결과 보기
+                  {isCopied ? "✓" : "📋"}
                 </button>
               </div>
             </div>
-            {viewMode === "final" && (
-              <CharacterCount
-                characterCount={editedStats.characterCount}
-                wordCount={editedStats.wordCount}
-                lineCount={editedStats.lineCount}
-                charLimit={charLimit}
-                isOverLimit={editedStats.isOverLimit}
-                showCopyButton={true}
-                onCopy={handleCopyResult}
-                isCopied={isCopied}
-              />
-            )}
           </div>
           <div
-            className="h-128 p-4 overflow-y-auto text-gray-900 dark:text-white whitespace-pre-wrap"
+            className="h-128 p-4 mb-1.5 overflow-y-auto text-gray-900 dark:text-white whitespace-pre-wrap"
             role="textbox"
             aria-label={viewMode === "diff" ? "변경사항" : "최종 결과"}
           >

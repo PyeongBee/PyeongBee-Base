@@ -13,19 +13,12 @@ const OriginalEditor: React.FC<OriginalEditorProps> = React.memo(
     const textStats = getTextStats(originalText, charLimit);
 
     return (
-      <div className="max-w-1/2 mx-auto">
+      <div className="w-full">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
           <div className="flex justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700">
             <label className="text-lg font-semibold text-gray-900 dark:text-white">
               원본 자소서
             </label>
-            <CharacterCount
-              characterCount={textStats.characterCount}
-              wordCount={textStats.wordCount}
-              lineCount={textStats.lineCount}
-              charLimit={charLimit}
-              isOverLimit={textStats.isOverLimit}
-            />
           </div>
           <textarea
             className="w-full h-128 p-4 border-0 resize-none focus:outline-none focus:ring-0 

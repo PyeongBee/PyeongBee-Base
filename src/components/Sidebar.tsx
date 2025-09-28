@@ -41,7 +41,7 @@ export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
                 alt="로고"
                 className="w-12 h-12 object-contain"
               />
-              <span className="font-semibold text-gray-900 dark:text-white text-base logo-text">
+              <span className="font-semibold text-amber-800 dark:text-amber-300 text-base logo-text">
                 평비의 Honey Pot
               </span>
             </div>

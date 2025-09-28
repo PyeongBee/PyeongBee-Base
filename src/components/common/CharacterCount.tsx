@@ -26,10 +26,10 @@ const Value: React.FC<ValueProps> = ({
 }) => (
   <span
     className={`
-    font-medium text-gray-900 dark:text-white
-    ${isOverLimit ? "text-red-600 dark:text-red-400" : ""}
-    ${className}
-  `}
+      font-medium text-amber-800 dark:text-amber-300
+      ${isOverLimit ? "text-red-600 dark:text-red-400" : ""}
+      ${className}
+    `}
   >
     {children}
   </span>
@@ -48,7 +48,7 @@ const StatItem: React.FC<StatItemProps> = ({
   isOverLimit = false,
   className = "",
 }) => (
-  <div className={`flex items-center gap-1 ${className}`}>
+  <div className={`flex items-center justify-between gap-2 ${className}`}>
     <Label>{label}:</Label>
     <Value isOverLimit={isOverLimit}>{value}</Value>
   </div>
@@ -60,7 +60,7 @@ interface StatGroupProps {
 }
 
 const StatGroup: React.FC<StatGroupProps> = ({ children, className = "" }) => (
-  <div className={`flex gap-4 text-sm ${className}`}>{children}</div>
+  <div className={`flex flex-col gap-2 text-sm ${className}`}>{children}</div>
 );
 
 interface CharacterCountComponentProps extends CharacterCountProps {
@@ -95,7 +95,7 @@ const CharacterCount: React.FC<CharacterCountComponentProps> = React.memo(
         {showCopyButton && onCopy && (
           <button
             className={`
-            ml-2 w-8 h-8 flex items-center justify-center text-xs rounded transition-all duration-200
+            w-full mt-2 py-2 px-3 flex items-center justify-center text-xs rounded transition-all duration-200
             ${
               isCopied
                 ? "bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300"

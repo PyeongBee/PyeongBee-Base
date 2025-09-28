@@ -16,11 +16,15 @@ export const ModeButton: React.FC<ModeButtonProps> = React.memo(
     return (
       <button
         className={`
-        px-4 py-1 border-2 bg-transparent text-white rounded-full
+        px-4 py-1 border-2 text-white rounded-full
         font-medium transition-all duration-200 
         hover:bg-white/10 hover:border-white/50
         focus:outline-none focus:ring-2 focus:ring-white/50
-        ${active ? "bg-amber-800 border-amber-800" : "border-white/30"}
+        ${
+          active
+            ? "bg-amber-800 border-amber-800"
+            : "bg-transparent border-white/30"
+        }
         ${className}
       `}
         onClick={onClick}

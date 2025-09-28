@@ -7,6 +7,8 @@ import OriginalEditor from "../../components/editor/OriginalEditor";
 import { useSidebarStore } from "../../stores/sidebarStore";
 import { useDeviceStore } from "../../stores/deviceStore";
 import { ViewMode, ShareData } from "../../types/editor";
+import { getTextStats } from "../../utils/textUtils";
+import CharacterCount from "../../components/common/CharacterCount";
 import {
   copyToClipboard,
   createShareUrl,
@@ -27,6 +29,7 @@ import {
   InputLabel,
   InputField,
 } from "../../components/common/Input";
+import { Share2 } from "lucide-react";
 
 // 에디터 페이지는 독립적으로 렌더링
 export const dynamic = "force-dynamic";
@@ -162,6 +165,16 @@ export default function EditorPage() {
     }
   }, [shareUrl]);
 
+  const handleCopyResult = useCallback(async () => {
+    const result = await copyToClipboard(editedText);
+    if (result.success) {
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), COPY_SUCCESS_DURATION);
+    } else {
+      console.error("결과 복사 실패:", result.message);
+    }
+  }, [editedText]);
+
   const ModeChangeButton = ({
     mode,
     modeText,
@@ -215,63 +228,93 @@ export default function EditorPage() {
           />
           <ModeChangeButton mode="edit" modeText="수정" isMobile={isMobile} />
           <ModeChangeButton mode="result" modeText="결과" isMobile={isMobile} />
-
-          <Button
-            variant="ghost"
-            onClick={handleShareClick}
-            className="border-2 border-white/30 hover:border-white/50 text-white hover:bg-white/10"
-            aria-label="작성한 자소서 공유하기"
-          >
-            <span className="hidden sm:inline">공유하기</span>
-            <span className="sm:hidden">공유</span>
-          </Button>
         </div>
       </header>
 
-      <div className="mt-20 px-16 py-4 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
-        {viewMode === "original" ? (
-          <div className="flex items-center gap-8 flex-wrap">
-            <InputGroup>
-              <InputLabel htmlFor="question-input">문항</InputLabel>
-              <InputField
-                id="question-input"
-                type="text"
-                value={questionText}
-                onChange={handleQuestionChange}
-                placeholder="자소서 문항을 입력하세요..."
-              />
-            </InputGroup>
-            <div className="flex items-center gap-2">
-              <InputLabel htmlFor="char-limit-input">글자수 제한</InputLabel>
-              <InputField
-                id="char-limit-input"
-                type="number"
-                value={questionCharLimit}
-                onChange={(value) =>
-                  handleQuestionLimitChange(
-                    parseInt(value) || DEFAULT_CHAR_LIMIT
-                  )
-                }
-                className="w-20 text-center"
-                min={MIN_CHAR_LIMIT}
-                max={MAX_CHAR_LIMIT}
-                step={CHAR_LIMIT_STEP}
-              />
+      <div className="mt-20 px-6 py-4 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-6">
+          {/* 문항 입력 영역 */}
+
+          {viewMode === "original" ? (
+            <div className="lg:col-span-3">
+              <div className="h-full bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700">
+                <textarea
+                  id="question-input"
+                  value={questionText}
+                  onChange={(e) => handleQuestionChange(e.target.value)}
+                  placeholder="자소서 문항을 입력하세요. 예: '본인의 성장 과정에서 가장 중요한 경험은 무엇이며, 그것이 현재의 당신에게 어떤 영향을 미쳤나요?'"
+                  className="w-full h-32 p-4 border-0 resize-none focus:outline-none focus:ring-0 
+                           bg-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
+                  rows={4}
+                />
+              </div>
             </div>
-          </div>
-        ) : (
-          <div className="flex items-center gap-4 flex-wrap">
-            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              문항
-            </span>
-            <span className="text-gray-900 dark:text-white">
-              {questionText || "문항이 입력되지 않았습니다."}
-            </span>
-            <span className="text-sm text-gray-500 dark:text-gray-400">
-              (제한: {questionCharLimit}자)
-            </span>
-          </div>
-        )}
+          ) : (
+            <div className="lg:col-span-4">
+              <div className="space-y-2">
+                <p className="text-gray-900 dark:text-white leading-relaxed">
+                  {questionText || "문항이 입력되지 않았습니다."}
+                </p>
+                <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+                  <span className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-md">
+                    제한: {questionCharLimit}자
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* 글자수 제한 설정 영역 */}
+          {viewMode === "original" && (
+            <div className="lg:col-span-1">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-4 sticky top-24">
+                <div className="flex items-center gap-3 mb-2">
+                  <div className="w-2 h-2 bg-amber-800 rounded-full"></div>
+                  <InputLabel
+                    htmlFor="char-limit-input"
+                    className="text-sm font-medium text-gray-900 dark:text-white"
+                  >
+                    글자수 제한
+                  </InputLabel>
+                </div>
+                <div className="flex items-center gap-3 mb-2">
+                  <InputField
+                    id="char-limit-input"
+                    type="number"
+                    value={questionCharLimit}
+                    onChange={(value) =>
+                      handleQuestionLimitChange(
+                        parseInt(value) || DEFAULT_CHAR_LIMIT
+                      )
+                    }
+                    className="w-24 text-center font-medium"
+                    min={MIN_CHAR_LIMIT}
+                    max={MAX_CHAR_LIMIT}
+                    step={CHAR_LIMIT_STEP}
+                  />
+                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                    자
+                  </span>
+                </div>
+                <div className="flex flex-wrap justify-around gap-2">
+                  {[500, 1000, 1500, 2000].map((limit) => (
+                    <button
+                      key={limit}
+                      onClick={() => handleQuestionLimitChange(limit)}
+                      className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
+                        questionCharLimit === limit
+                          ? "bg-amber-800 text-white"
+                          : "bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600"
+                      }`}
+                    >
+                      {limit}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       <main
@@ -280,28 +323,102 @@ export default function EditorPage() {
         role="tabpanel"
         aria-label={`${viewMode} 모드 에디터`}
       >
-        {viewMode === "original" ? (
-          <OriginalEditor
-            originalText={originalText}
-            onOriginalChange={handleOriginalChange}
-            charLimit={questionCharLimit}
-          />
-        ) : viewMode === "edit" ? (
-          <Editor
-            originalText={originalText}
-            editedText={editedText}
-            onOriginalChange={handleOriginalChange}
-            onEditedChange={handleEditedChange}
-            charLimit={questionCharLimit}
-          />
-        ) : (
-          <DiffViewer
-            originalText={originalText}
-            editedText={editedText}
-            charLimit={questionCharLimit}
-          />
-        )}
+        <div
+          className={`max-w-7xl mx-auto ${
+            viewMode === "original"
+              ? "grid grid-cols-1 lg:grid-cols-4 gap-6"
+              : viewMode === "edit" || viewMode === "result"
+              ? "grid grid-cols-1 lg:grid-cols-4 gap-6"
+              : ""
+          }`}
+        >
+          {/* 메인 에디터 영역 */}
+          <div
+            className={
+              viewMode === "original" ||
+              viewMode === "edit" ||
+              viewMode === "result"
+                ? "lg:col-span-3"
+                : ""
+            }
+          >
+            {viewMode === "original" ? (
+              <OriginalEditor
+                originalText={originalText}
+                onOriginalChange={handleOriginalChange}
+                charLimit={questionCharLimit}
+              />
+            ) : viewMode === "edit" ? (
+              <Editor
+                originalText={originalText}
+                editedText={editedText}
+                onOriginalChange={handleOriginalChange}
+                onEditedChange={handleEditedChange}
+                charLimit={questionCharLimit}
+              />
+            ) : (
+              <DiffViewer
+                originalText={originalText}
+                editedText={editedText}
+                charLimit={questionCharLimit}
+              />
+            )}
+          </div>
+
+          {/* 사이드바 영역 */}
+          {(viewMode === "original" ||
+            viewMode === "edit" ||
+            viewMode === "result") && (
+            <div className="lg:col-span-1">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-4 sticky top-24">
+                <CharacterCount
+                  characterCount={
+                    viewMode === "original"
+                      ? getTextStats(originalText, questionCharLimit)
+                          .characterCount
+                      : getTextStats(editedText, questionCharLimit)
+                          .characterCount
+                  }
+                  wordCount={
+                    viewMode === "original"
+                      ? getTextStats(originalText, questionCharLimit).wordCount
+                      : getTextStats(editedText, questionCharLimit).wordCount
+                  }
+                  lineCount={
+                    viewMode === "original"
+                      ? getTextStats(originalText, questionCharLimit).lineCount
+                      : getTextStats(editedText, questionCharLimit).lineCount
+                  }
+                  charLimit={questionCharLimit}
+                  isOverLimit={
+                    viewMode === "original"
+                      ? getTextStats(originalText, questionCharLimit)
+                          .isOverLimit
+                      : getTextStats(editedText, questionCharLimit).isOverLimit
+                  }
+                />
+              </div>
+            </div>
+          )}
+        </div>
       </main>
+
+      {/* 플로팅 공유 버튼 */}
+      <button
+        onClick={handleShareClick}
+        className={`fixed right-3 z-[1000] 
+                   w-14 h-14 rounded-full 
+                   bg-gradient-to-br from-brand-primary to-brand-secondary
+                   shadow-lg hover:shadow-xl
+                   flex items-center justify-center
+                   transition-all duration-300 ease-in-out
+                   hover:scale-105 active:scale-95
+                   group
+                   ${isMobile ? "bottom-15" : "bottom-3"}`}
+        aria-label="작성한 자소서 공유하기"
+      >
+        <Share2 className="w-6 h-6 text-white group-hover:scale-110 transition-transform duration-200" />
+      </button>
 
       {/* 공유 URL 모달 */}
       {shareUrl && (
