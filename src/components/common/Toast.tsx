@@ -2,9 +2,15 @@
 
 import React, { useEffect, useState, useCallback } from "react";
 import { CheckCircle, AlertCircle, X } from "lucide-react";
-import { ToastProps } from "../../types";
 import { MESSAGES } from "../../constants";
 import { getToastClasses, cn, TOAST_DURATIONS } from "../../styles/components";
+
+interface ToastProps {
+  message: string;
+  type?: "success" | "error" | "info";
+  duration?: number;
+  onClose: () => void;
+}
 
 const Toast: React.FC<ToastProps> = ({ 
   message, 

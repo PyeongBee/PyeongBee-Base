@@ -1,6 +1,5 @@
 import React, { useCallback } from "react";
 import { CheckSquare } from "lucide-react";
-import { EditorProps } from "../../types";
 import { useSpellCheck } from "../../hooks/useSpellCheck";
 import { useToastStore } from "../../stores/toastStore";
 import { MESSAGES } from "../../constants";
@@ -8,6 +7,12 @@ import HighlightedText from "./HighlightedText";
 import { Button } from "../common/Button";
 import Toast from "../common/Toast";
 import { cn } from "../../styles/components";
+
+interface EditorProps {
+  originalText: string;
+  editedText: string;
+  onEditedChange: (text: string) => void;
+}
 
 const Editor: React.FC<EditorProps> = React.memo(
   function Editor({

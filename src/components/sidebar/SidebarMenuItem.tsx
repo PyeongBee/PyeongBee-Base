@@ -1,21 +1,39 @@
 import React from "react";
-import Link from "next/link";
-import { MenuItem } from "../../types";
+import { useRouter, usePathname } from "next/navigation";
+import { MenuItem } from "../../types/components";
 import { cn } from "../../styles/components";
 
 interface SidebarMenuItemProps {
   item: MenuItem;
   isCollapsed: boolean;
+  onNavigate?: (href: string) => void;
 }
 
-const SidebarMenuItem: React.FC<SidebarMenuItemProps> = ({ item, isCollapsed }) => {
+const SidebarMenuItem: React.FC<SidebarMenuItemProps> = ({ item, isCollapsed, onNavigate }) => {
+  const router = useRouter();
+  const pathname = usePathname();
   const IconComponent = item.icon;
 
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    
+    // 현재 페이지와 같은 경로면 이동하지 않음
+    if (pathname === item.href) {
+      return;
+    }
+
+    if (onNavigate) {
+      onNavigate(item.href);
+    } else {
+      router.push(item.href);
+    }
+  };
+
   return (
-    <Link
-      href={item.href}
+    <button
+      onClick={handleClick}
       className={cn(
-        "flex items-center rounded-lg transition-all duration-200",
+        "flex items-center rounded-lg transition-all duration-200 w-full text-left",
         "hover:bg-gray-100 dark:hover:bg-gray-800 hover:scale-105 sidebar-menu-item",
         isCollapsed ? "justify-center h-10 px-2" : "h-10 px-3"
       )}
@@ -29,7 +47,7 @@ const SidebarMenuItem: React.FC<SidebarMenuItemProps> = ({ item, isCollapsed }) 
           {item.label}
         </span>
       )}
-    </Link>
+    </button>
   );
 };
 

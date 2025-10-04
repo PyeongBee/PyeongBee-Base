@@ -1,14 +1,19 @@
 "use client";
 
 import React from "react";
-import { SidebarProps } from "../types";
 import { MENU_ITEMS } from "../constants";
 import { getSidebarClasses } from "../styles/components";
 import SidebarLogo from "./sidebar/SidebarLogo";
 import SidebarMenuItem from "./sidebar/SidebarMenuItem";
 import SidebarToggle from "./sidebar/SidebarToggle";
 
-const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
+interface SidebarProps {
+  isCollapsed: boolean;
+  onToggle: () => void;
+  onNavigate?: (href: string) => void;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle, onNavigate }) => {
 
   return (
     <div
@@ -20,7 +25,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
 
       <nav className={`flex-1 space-y-1 sidebar-nav ${isCollapsed ? "p-3 collapsed" : "p-3"}`}>
         {MENU_ITEMS.map((item, index) => (
-          <SidebarMenuItem key={index} item={item} isCollapsed={isCollapsed} />
+          <SidebarMenuItem key={index} item={item} isCollapsed={isCollapsed} onNavigate={onNavigate} />
         ))}
       </nav>
 

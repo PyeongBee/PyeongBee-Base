@@ -126,14 +126,20 @@ export default function EditorPage() {
 
   const handleOriginalChange = (text: string) => {
     setOriginalText(text);
+    // 에디터 내용 변경 시 sessionStorage에 저장
+    sessionStorage.setItem('editorContent', text + editedText + questionText);
   };
 
   const handleEditedChange = (text: string) => {
     setEditedText(text);
+    // 에디터 내용 변경 시 sessionStorage에 저장
+    sessionStorage.setItem('editorContent', originalText + text + questionText);
   };
 
   const handleQuestionChange = (text: string) => {
     setQuestionText(text);
+    // 에디터 내용 변경 시 sessionStorage에 저장
+    sessionStorage.setItem('editorContent', originalText + editedText + text);
   };
 
   const handleQuestionLimitChange = (limit: number) => {

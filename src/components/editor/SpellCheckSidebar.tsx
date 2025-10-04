@@ -2,10 +2,13 @@
 
 import React, { useCallback } from "react";
 import { useSpellCheckStore } from "../../stores/spellCheckStore";
-import { SpellCheckSidebarProps } from "../../types";
 import { MESSAGES } from "../../constants";
 import { Button } from "../common/Button";
 import { CheckCircle2, Circle, Loader2 } from "lucide-react";
+
+interface SpellCheckSidebarProps {
+  onApplyCorrections: () => void;
+}
 
 const SpellCheckSidebar: React.FC<SpellCheckSidebarProps> = ({
   onApplyCorrections,

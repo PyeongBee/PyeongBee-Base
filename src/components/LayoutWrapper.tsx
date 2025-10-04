@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import Sidebar from "./Sidebar";
 import MobileNavigation from "./MobileNavigation";
 import { useSidebarStore } from "../stores/sidebarStore";
@@ -12,8 +13,26 @@ interface LayoutWrapperProps {
 
 export default function LayoutWrapper({ children }: LayoutWrapperProps) {
   const { isCollapsed, toggleSidebar, _hasHydrated } = useSidebarStore();
+  const pathname = usePathname();
   const [isMobile, setIsMobile] = useState(false);
   const [isClient, setIsClient] = useState(false);
+
+  // 에디터 페이지에서 unsaved changes 확인
+  const handleNavigation = (href: string) => {
+    if (pathname === '/editor') {
+      // 에디터 페이지에서 나갈 때 확인
+      const hasContent = sessionStorage.getItem('editorContent');
+      if (hasContent && hasContent.trim()) {
+        if (window.confirm("입력한 내용이 있습니다. 정말 나가시겠습니까? 저장되지 않은 내용은 사라집니다.")) {
+          window.location.href = href;
+        }
+      } else {
+        window.location.href = href;
+      }
+    } else {
+      window.location.href = href;
+    }
+  };
 
   useEffect(() => {
     setIsClient(true);
@@ -33,7 +52,7 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
       {/* 데스크톱 사이드바 - 클라이언트에서만 표시 */}
       {!isMobile && isClient && (
         <div className="relative">
-          <Sidebar isCollapsed={isCollapsed} onToggle={toggleSidebar} />
+          <Sidebar isCollapsed={isCollapsed} onToggle={toggleSidebar} onNavigate={handleNavigation} />
         </div>
       )}
 
