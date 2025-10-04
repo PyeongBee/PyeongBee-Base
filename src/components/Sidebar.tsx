@@ -2,7 +2,8 @@
 
 import React from "react";
 import { SidebarProps } from "../types";
-import { MENU_ITEMS, SIDEBAR, ANIMATION } from "../constants";
+import { MENU_ITEMS } from "../constants";
+import { getSidebarClasses } from "../styles/components";
 import SidebarLogo from "./sidebar/SidebarLogo";
 import SidebarMenuItem from "./sidebar/SidebarMenuItem";
 import SidebarToggle from "./sidebar/SidebarToggle";
@@ -11,9 +12,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
 
   return (
     <div
-      className={`bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 ${ANIMATION.TRANSITION_ALL} ${SIDEBAR.TRANSITION_DURATION} relative h-full flex flex-col ${
-        isCollapsed ? SIDEBAR.COLLAPSED_WIDTH : SIDEBAR.EXPANDED_WIDTH
-      }`}
+      className={getSidebarClasses(isCollapsed)}
     >
       <div className="border-b border-gray-200 dark:border-gray-700 sidebar-logo py-1 px-2">
         <SidebarLogo isCollapsed={isCollapsed} />

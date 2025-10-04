@@ -21,5 +21,3 @@ export const SectionDescription: React.FC<SectionDescriptionProps> = ({ children
     {children}
   </p>
 );
-
-export { SectionTitle, SectionDescription };

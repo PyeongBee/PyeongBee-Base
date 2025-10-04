@@ -5,7 +5,7 @@ import { LazyDiffViewer, LazyEditor, LazyOriginalEditor, LazySpellCheckSidebar }
 import { useSidebarStore } from "../../stores/sidebarStore";
 import { useDeviceStore } from "../../stores/deviceStore";
 import { useSpellCheckStore } from "../../stores/spellCheckStore";
-import { useToast } from "../../hooks/useToast";
+import { useToastStore } from "../../stores/toastStore";
 import { ViewMode, ShareData } from "../../types/editor";
 import { getTextStats } from "../../utils/textUtils";
 import CharacterCount from "../../components/common/CharacterCount";
@@ -42,7 +42,7 @@ export default function EditorPage() {
     setSpellCheckMode, 
     clearSuggestions 
   } = useSpellCheckStore();
-  const { toasts, showSuccess, showError, removeToast } = useToast();
+  const { toasts, showSuccess, showError, removeToast } = useToastStore();
   const [originalText, setOriginalText] = useState<string>("");
   const [editedText, setEditedText] = useState<string>("");
   const [questionText, setQuestionText] = useState<string>("");
@@ -237,7 +237,7 @@ export default function EditorPage() {
       <header
         className={`
         fixed top-0 right-0 z-[1000] 
-        bg-gradient-to-br from-brand-primary to-brand-secondary text-white
+        bg-gradient-to-br from-brand-400 to-brand-500 text-white
         px-8 py-2 shadow-lg
         flex justify-between items-center
         transition-all duration-300 ease-in-out
@@ -376,7 +376,6 @@ export default function EditorPage() {
               <LazyOriginalEditor
                 originalText={originalText}
                 onOriginalChange={handleOriginalChange}
-                charLimit={questionCharLimit}
               />
             ) : viewMode === "edit" ? (
               <LazyEditor
@@ -484,7 +483,7 @@ export default function EditorPage() {
                 placeholder="공유 URL"
               />
               <Button
-                variant={isCopied ? "secondary" : "primary"}
+                variant={isCopied ? "secondary" : "default"}
                 onClick={handleCopyUrl}
                 className="whitespace-nowrap"
               >

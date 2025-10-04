@@ -1,6 +1,6 @@
 import React from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { SIZES, ANIMATION, Z_INDEX } from "../../constants";
+import { cn } from "../../styles/components";
 
 interface SidebarToggleProps {
   isCollapsed: boolean;
@@ -9,15 +9,20 @@ interface SidebarToggleProps {
 
 const SidebarToggle: React.FC<SidebarToggleProps> = ({ isCollapsed, onToggle }) => {
   return (
-    <div className={`absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-1/2 ${Z_INDEX.SIDEBAR_TOGGLE}`}>
+    <div className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-1/2 z-10">
       <button
         onClick={onToggle}
-        className={`${SIZES.TOGGLE_BUTTON_SIZE} bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-full flex items-center justify-center shadow-lg hover:bg-gray-50 dark:hover:bg-gray-700 ${ANIMATION.TRANSITION_ALL} ${ANIMATION.DURATION_200} ${ANIMATION.HOVER_SCALE_SMALL}`}
+        className={cn(
+          "w-8 h-8 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700",
+          "rounded-full flex items-center justify-center shadow-lg",
+          "hover:bg-gray-50 dark:hover:bg-gray-700 hover:scale-110",
+          "transition-all duration-200"
+        )}
       >
         {isCollapsed ? (
-          <ChevronRight className={`${SIZES.ICON_SMALL} text-gray-600 dark:text-gray-400`} />
+          <ChevronRight className="w-4 h-4 text-gray-600 dark:text-gray-400" />
         ) : (
-          <ChevronLeft className={`${SIZES.ICON_SMALL} text-gray-600 dark:text-gray-400`} />
+          <ChevronLeft className="w-4 h-4 text-gray-600 dark:text-gray-400" />
         )}
       </button>
     </div>

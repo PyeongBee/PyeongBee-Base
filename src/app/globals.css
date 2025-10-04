@@ -12,19 +12,84 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   
-  /* 브랜드 색상 */
+  /* 브랜드 색상 시스템 */
+  --color-brand-50: #fffbeb;
+  --color-brand-100: #fef3c7;
+  --color-brand-200: #fde68a;
+  --color-brand-300: #fcd34d;
+  --color-brand-400: #fbbf24;
+  --color-brand-500: #f59e0b;
+  --color-brand-600: #d97706;
+  --color-brand-700: #b45309;
+  --color-brand-800: #92400e;
+  --color-brand-900: #78350f;
+  --color-brand-950: #451a03;
+  
+  /* 브랜드 그라데이션 (기존 호환성) */
   --color-brand-primary: #fbbf24;
   --color-brand-secondary: #f59e0b;
-  --color-brand-dark: #92400e;
   
-  /* 추가 색상 팔레트 */
-  --color-success: #10b981;
-  --color-warning: #f59e0b;
-  --color-error: #ef4444;
+  /* 시맨틱 색상 */
+  --color-success-50: #ecfdf5;
+  --color-success-500: #10b981;
+  --color-success-600: #059669;
+  --color-warning-50: #fffbeb;
+  --color-warning-500: #f59e0b;
+  --color-warning-600: #d97706;
+  --color-error-50: #fef2f2;
+  --color-error-500: #ef4444;
+  --color-error-600: #dc2626;
   
-  /* 간격 확장 */
+  /* 컴포넌트 크기 시스템 */
+  --size-xs: 0.75rem;
+  --size-sm: 0.875rem;
+  --size-base: 1rem;
+  --size-lg: 1.125rem;
+  --size-xl: 1.25rem;
+  --size-2xl: 1.5rem;
+  --size-3xl: 1.875rem;
+  --size-4xl: 2.25rem;
+  
+  /* 간격 시스템 확장 */
   --spacing-18: 4.5rem;
   --spacing-88: 22rem;
+  --spacing-128: 32rem;
+  
+  /* 높이 시스템 */
+  --height-128: 32rem;
+  
+  /* 그림자 시스템 */
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  
+  /* 애니메이션 지속시간 */
+  --duration-75: 75ms;
+  --duration-100: 100ms;
+  --duration-150: 150ms;
+  --duration-200: 200ms;
+  --duration-300: 300ms;
+  --duration-500: 500ms;
+  
+  /* 컴포넌트별 기본 스타일 */
+  --button-height-sm: 2rem;
+  --button-height-md: 2.5rem;
+  --button-height-lg: 3rem;
+  --button-padding-x-sm: 0.75rem;
+  --button-padding-x-md: 1rem;
+  --button-padding-x-lg: 1.5rem;
+  
+  --input-height-sm: 2rem;
+  --input-height-md: 2.5rem;
+  --input-height-lg: 3rem;
+  
+  --toggle-width-sm: 2rem;
+  --toggle-width-md: 3rem;
+  --toggle-width-lg: 4rem;
+  --toggle-height-sm: 1rem;
+  --toggle-height-md: 1.5rem;
+  --toggle-height-lg: 2rem;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -199,7 +264,7 @@ body {
 }
 
 .sidebar-logo:hover {
-  background-color: rgba(59, 130, 246, 0.05);
+  background-color: color-mix(in srgb, var(--color-brand-400) 5%, transparent);
 }
 
 .sidebar-logo .logo-icon {
@@ -216,7 +281,7 @@ body {
 }
 
 .sidebar-logo:hover .logo-text {
-  color: #3b82f6;
+  color: var(--color-brand-500);
 }
 
 /* 사이드바 메뉴 아이템 활성 상태 */

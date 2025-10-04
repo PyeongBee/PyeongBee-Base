@@ -1,6 +1,7 @@
 import React from "react";
 import Image from "next/image";
-import { NAVIGATION, SIDEBAR } from "../../constants";
+import { NAVIGATION } from "../../constants";
+import { sidebarStyles } from "../../styles/components";
 
 interface SidebarLogoProps {
   isCollapsed: boolean;
@@ -14,8 +15,8 @@ const SidebarLogo: React.FC<SidebarLogoProps> = ({ isCollapsed }) => {
           <Image
             src={NAVIGATION.LOGO_PATH}
             alt={NAVIGATION.LOGO_ALT}
-            width={SIDEBAR.LOGO_SIZE}
-            height={SIDEBAR.LOGO_SIZE}
+            width={sidebarStyles.logo.size}
+            height={sidebarStyles.logo.size}
             className="object-contain"
             priority
           />
@@ -27,8 +28,8 @@ const SidebarLogo: React.FC<SidebarLogoProps> = ({ isCollapsed }) => {
         <Image
           src={NAVIGATION.LOGO_PATH}
           alt={NAVIGATION.LOGO_ALT}
-          width={SIDEBAR.LOGO_SIZE}
-          height={SIDEBAR.LOGO_SIZE}
+          width={sidebarStyles.logo.size}
+          height={sidebarStyles.logo.size}
           className="object-contain"
           priority
         />

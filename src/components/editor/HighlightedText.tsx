@@ -53,15 +53,20 @@ const HighlightedText: React.FC<HighlightedTextProps> = ({ text, className = "" 
     <div className={className}>
       {parts.map((part, index) => {
         if (part.isHighlighted && part.suggestionId) {
+          const suggestion = suggestions.find(s => s.id === part.suggestionId);
           const isHovered = hoveredSuggestionId === part.suggestionId;
+          const isChecked = suggestion?.isChecked || false;
+          
+          let bgColor = "bg-red-200 dark:bg-red-800 text-red-800 dark:text-red-200"; // 교정 필요
+          
+          if (isHovered || isChecked) {
+            bgColor = "bg-yellow-200 dark:bg-yellow-700 text-yellow-900 dark:text-yellow-100";
+          }
+          
           return (
             <span
               key={index}
-              className={`transition-all duration-200 ${
-                isHovered
-                  ? "bg-yellow-300 dark:bg-yellow-600 text-gray-900 dark:text-white"
-                  : "bg-red-200 dark:bg-red-800 text-red-800 dark:text-red-200"
-              } px-1 rounded`}
+              className={`transition-all duration-200 ${bgColor} px-1 rounded`}
             >
               {part.text}
             </span>

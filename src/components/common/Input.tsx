@@ -1,4 +1,5 @@
 import React from 'react';
+import { getInputClasses, type InputSize, type InputState, cn } from '@/styles/components';
 
 // Input 관련 컴포넌트들
 interface InputGroupProps {
@@ -6,8 +7,8 @@ interface InputGroupProps {
   className?: string;
 }
 
-export const InputGroup: React.FC<InputGroupProps> = ({ children, className = '' }) => (
-  <div className={`flex items-center gap-4 flex-1 min-w-[300px] ${className}`}>
+export const InputGroup: React.FC<InputGroupProps> = ({ children, className }) => (
+  <div className={cn('flex items-center gap-4 flex-1 min-w-[300px]', className)}>
     {children}
   </div>
 );
@@ -18,10 +19,10 @@ interface InputLabelProps {
   className?: string;
 }
 
-export const InputLabel: React.FC<InputLabelProps> = ({ children, htmlFor, className = '' }) => (
+export const InputLabel: React.FC<InputLabelProps> = ({ children, htmlFor, className }) => (
   <label 
     htmlFor={htmlFor}
-    className={`text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap ${className}`}
+    className={cn('text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap', className)}
   >
     {children}
   </label>
@@ -37,6 +38,8 @@ interface InputFieldProps {
   min?: number;
   max?: number;
   step?: number;
+  size?: InputSize;
+  state?: InputState;
 }
 
 export const InputField: React.FC<InputFieldProps> = ({ 
@@ -44,18 +47,18 @@ export const InputField: React.FC<InputFieldProps> = ({
   value, 
   onChange, 
   placeholder, 
-  className = '', 
+  className, 
   id,
   min,
   max,
-  step
+  step,
+  size = 'md',
+  state = 'default'
 }) => (
   <input
     id={id}
     type={type}
-    className={`flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm 
-               focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 
-               dark:bg-gray-700 dark:text-white ${className}`}
+    className={getInputClasses(size, state, cn('flex-1', className))}
     value={value}
     onChange={(e) => onChange(e.target.value)}
     placeholder={placeholder}
@@ -64,5 +67,3 @@ export const InputField: React.FC<InputFieldProps> = ({
     step={step}
   />
 );
-
-export { InputGroup, InputLabel, InputField };

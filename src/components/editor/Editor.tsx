@@ -2,11 +2,12 @@ import React, { useCallback } from "react";
 import { CheckSquare } from "lucide-react";
 import { EditorProps } from "../../types";
 import { useSpellCheck } from "../../hooks/useSpellCheck";
-import { useToast } from "../../hooks/useToast";
-import { MESSAGES, SIZES, COLORS } from "../../constants";
+import { useToastStore } from "../../stores/toastStore";
+import { MESSAGES } from "../../constants";
 import HighlightedText from "./HighlightedText";
 import { Button } from "../common/Button";
 import Toast from "../common/Toast";
+import { cn } from "../../styles/components";
 
 const Editor: React.FC<EditorProps> = React.memo(
   function Editor({
@@ -14,7 +15,7 @@ const Editor: React.FC<EditorProps> = React.memo(
     editedText,
     onEditedChange,
   }) {
-    const { toasts, showError, showSuccess, removeToast } = useToast();
+    const { toasts, showError, showSuccess, removeToast } = useToastStore();
     const { isSpellCheckMode, isLoading, performSpellCheck, cancelSpellCheck } = useSpellCheck({
       showError,
       showSuccess,
@@ -50,27 +51,26 @@ const Editor: React.FC<EditorProps> = React.memo(
                   <>
                     <Button
                       onClick={handleSpellCheck}
-                      variant="primary"
+                      variant="default"
                       className="text-sm flex items-center gap-2"
                       disabled={isLoading || !editedText.trim()}
                     >
-                      <CheckSquare className={SIZES.ICON_SMALL} />
+                      <CheckSquare className="w-4 h-4" />
                       {MESSAGES.BUTTONS.SPELL_CHECK}
                     </Button>
-                    <button
+                    <Button
                       onClick={handleCopyOriginal}
-                      className={`px-4 py-2 bg-gradient-to-br ${COLORS.BRAND_PRIMARY} ${COLORS.BRAND_SECONDARY} hover:from-brand-primary/90 hover:to-brand-secondary/90 text-white text-sm rounded-lg transition-colors duration-200 flex items-center gap-2`}
-                      aria-label={MESSAGES.LABELS.COPY_ORIGINAL_ARIA}
-                      title={MESSAGES.LABELS.COPY_ORIGINAL_ARIA}
+                      variant="default"
+                      className="text-sm"
                     >
                       {MESSAGES.BUTTONS.COPY_ORIGINAL}
-                    </button>
+                    </Button>
                   </>
                 )}
               </div>
             </div>
             {isSpellCheckMode ? (
-              <div className={`w-full ${SIZES.EDITOR_HEIGHT} px-4 pt-4 pb-0 overflow-y-auto`}>
+              <div className="w-full h-128 px-4 pt-4 pb-0 overflow-y-auto">
                 <HighlightedText
                   text={editedText}
                   className="whitespace-pre-wrap text-gray-900 dark:text-white leading-relaxed"
@@ -78,10 +78,15 @@ const Editor: React.FC<EditorProps> = React.memo(
               </div>
             ) : (
               <textarea
-                className={`w-full ${SIZES.EDITOR_HEIGHT} px-4 pt-4 pb-0 border-0 resize-none focus:outline-none focus:ring-0 bg-transparent text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400`}
+                className={cn(
+                  "w-full h-128 px-4 pt-4 pb-0 border-0 resize-none",
+                  "focus:outline-none focus:ring-0 bg-transparent",
+                  "text-gray-900 dark:text-white",
+                  "placeholder-gray-500 dark:placeholder-gray-400"
+                )}
                 value={editedText}
                 onChange={(e) => onEditedChange(e.target.value)}
-                placeholder={MESSAGES.LABELS.PLACEHOLDER}
+                placeholder={MESSAGES.LABELS.EDIT_PLACEHOLDER}
                 aria-label={MESSAGES.LABELS.EDITOR_ARIA}
               />
             )}

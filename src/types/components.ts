@@ -55,9 +55,9 @@ export interface ToastProps {
   onClose: () => void;
 }
 
-// 버튼 관련
+// 버튼 관련 (deprecated - use Button component directly)
 export interface ButtonProps extends BaseComponentProps {
-  variant?: "primary" | "secondary" | "outline";
+  variant?: "default" | "secondary" | "outline" | "destructive" | "ghost" | "link";
   size?: "sm" | "md" | "lg";
   disabled?: boolean;
   onClick?: () => void;

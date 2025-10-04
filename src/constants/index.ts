@@ -5,4 +5,4 @@
 export * from './editor';
 export * from './messages';
 export * from './navigation';
-export * from './ui';
+// export * from './ui'; // deprecated - use @/styles/components instead
