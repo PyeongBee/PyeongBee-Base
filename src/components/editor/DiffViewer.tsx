@@ -1,9 +1,7 @@
 import React, { useState, useCallback } from "react";
 import * as Diff from "diff";
-import { getTextStats } from "../../utils/textUtils";
 import { copyToClipboard } from "../../utils/clipboardUtils";
 import { COPY_SUCCESS_DURATION } from "../../constants/editor";
-import CharacterCount from "../common/CharacterCount";
 import ToggleSwitch from "../common/ToggleSwitch";
 
 interface DiffViewerProps {
@@ -19,13 +17,11 @@ interface DiffPart {
 }
 
 const DiffViewer: React.FC<DiffViewerProps> = React.memo(
-  ({ originalText, editedText, charLimit }) => {
+  function DiffViewer({ originalText, editedText }) {
     const [isCopied, setIsCopied] = useState<boolean>(false);
     const [viewMode, setViewMode] = useState<"diff" | "final">("diff");
-    // diff 라이브러리를 사용하여 변경사항 계산 (단어 단위로 비교)
-    const diffParts: DiffPart[] = Diff.diffWords(originalText, editedText);
-
-    const editedStats = getTextStats(editedText, charLimit);
+    // diff 라이브러리를 사용하여 변경사항 계산 (띄어쓰기를 포함한 단어 단위 비교)
+    const diffParts: DiffPart[] = Diff.diffWordsWithSpace(originalText, editedText);
 
     const handleCopyResult = useCallback(async () => {
       const result = await copyToClipboard(editedText);
@@ -38,28 +34,7 @@ const DiffViewer: React.FC<DiffViewerProps> = React.memo(
       }
     }, [editedText]);
 
-    // 원본 텍스트 렌더링 (변경사항 없이 원본만 표시)
-    const renderOriginalText = () => {
-      if (!originalText) {
-        return (
-          <em className="text-gray-500 dark:text-gray-400">
-            원본 텍스트가 없습니다.
-          </em>
-        );
-      }
-
-      const lines = originalText.split("\n");
-      return lines.map((line, index) => (
-        <div key={index} className="flex">
-          <span className="w-8 text-sm text-gray-400 dark:text-gray-500 mr-4 select-none">
-            {index + 1}
-          </span>
-          <span className="flex-1">{line || "\u00A0"}</span>
-        </div>
-      ));
-    };
-
-    // 수정된 텍스트 렌더링 (단어 단위 변경사항 표시)
+    // 수정된 텍스트 렌더링 (단어 단위 변경사항 표시, 줄바꿈 시각화)
     const renderEditedText = () => {
       if (!editedText && !originalText) {
         return (
@@ -76,26 +51,13 @@ const DiffViewer: React.FC<DiffViewerProps> = React.memo(
 
       diffParts.forEach((part, index) => {
         const text = part.value;
-        const parts = text.split("\n");
-
-        parts.forEach((linePart, partIndex) => {
-          if (partIndex > 0) {
-            // 줄바꿈이 있으면 현재 줄을 완성하고 새 줄 시작
-            if (currentLine.length > 0) {
-              lines.push(
-                <div key={`line-${lineNumber}`} className="flex">
-                  <span className="w-8 text-sm text-gray-400 dark:text-gray-500 mr-4 select-none">
-                    {lineNumber}
-                  </span>
-                  <span className="flex-1">{currentLine}</span>
-                </div>
-              );
-              lineNumber++;
-              currentLine = [];
-            }
-          }
-
-          if (linePart) {
+        
+        // 줄바꿈을 기준으로 분할하되, 빈 줄도 유지
+        const lines_in_part = text.split('\n');
+        
+        lines_in_part.forEach((linePart, partIndex) => {
+          // 텍스트 내용 처리
+          if (linePart !== '') {
             if (part.removed) {
               currentLine.push(
                 <span
@@ -116,11 +78,53 @@ const DiffViewer: React.FC<DiffViewerProps> = React.memo(
               );
             } else {
               currentLine.push(
-                <span key={`unchanged-${index}-${partIndex}`} className="">
+                <span key={`unchanged-${index}-${partIndex}`}>
                   {linePart}
                 </span>
               );
             }
+          }
+
+          // 줄바꿈 처리 (마지막 파트가 아닌 경우)
+          if (partIndex < lines_in_part.length - 1) {
+            // 줄바꿈 기호를 현재 줄 끝에 추가
+            if (part.removed) {
+              currentLine.push(
+                <span
+                  key={`removed-newline-${index}-${partIndex}`}
+                  className="text-red-400 text-xs opacity-70 ml-1"
+                >
+                  ↵
+                </span>
+              );
+            } else if (part.added) {
+              currentLine.push(
+                <span
+                  key={`added-newline-${index}-${partIndex}`}
+                  className="text-green-400 text-xs opacity-70 ml-1"
+                >
+                  ↵
+                </span>
+              );
+            } else {
+              currentLine.push(
+                <span
+                  key={`unchanged-newline-${index}-${partIndex}`}
+                  className="text-gray-400 text-xs opacity-50 ml-1"
+                >
+                  ↵
+                </span>
+              );
+            }
+
+            // 현재 줄을 완성하고 새 줄 시작
+            lines.push(
+              <div key={`line-${lineNumber}`} className="mb-1">
+                {currentLine.length > 0 ? currentLine : '\u00A0'}
+              </div>
+            );
+            lineNumber++;
+            currentLine = [];
           }
         });
       });
@@ -128,11 +132,8 @@ const DiffViewer: React.FC<DiffViewerProps> = React.memo(
       // 마지막 줄 처리
       if (currentLine.length > 0) {
         lines.push(
-          <div key={`line-${lineNumber}`} className="flex">
-            <span className="w-8 text-sm text-gray-400 dark:text-gray-500 mr-4 select-none">
-              {lineNumber}
-            </span>
-            <span className="flex-1">{currentLine}</span>
+          <div key={`line-${lineNumber}`} className="mb-1">
+            {currentLine}
           </div>
         );
       }

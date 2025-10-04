@@ -4,8 +4,11 @@ import React, { useState, useEffect, useCallback } from "react";
 import DiffViewer from "../../components/editor/DiffViewer";
 import Editor from "../../components/editor/Editor";
 import OriginalEditor from "../../components/editor/OriginalEditor";
+import SpellCheckSidebar from "../../components/editor/SpellCheckSidebar";
 import { useSidebarStore } from "../../stores/sidebarStore";
 import { useDeviceStore } from "../../stores/deviceStore";
+import { useSpellCheckStore } from "../../stores/spellCheckStore";
+import { useToast } from "../../hooks/useToast";
 import { ViewMode, ShareData } from "../../types/editor";
 import { getTextStats } from "../../utils/textUtils";
 import CharacterCount from "../../components/common/CharacterCount";
@@ -13,11 +16,11 @@ import {
   copyToClipboard,
   createShareUrl,
   generateShareId,
+  decodeShareData,
 } from "../../utils/clipboardUtils";
 import {
   DEFAULT_CHAR_LIMIT,
   COPY_SUCCESS_DURATION,
-  MOBILE_BREAKPOINT,
   MIN_CHAR_LIMIT,
   MAX_CHAR_LIMIT,
   CHAR_LIMIT_STEP,
@@ -25,11 +28,11 @@ import {
 import { ModeButton } from "../../components/common/ModeButton";
 import { Button } from "../../components/common/Button";
 import {
-  InputGroup,
   InputLabel,
   InputField,
 } from "../../components/common/Input";
 import { Share2 } from "lucide-react";
+import Toast from "../../components/common/Toast";
 
 // 에디터 페이지는 독립적으로 렌더링
 export const dynamic = "force-dynamic";
@@ -37,13 +40,19 @@ export const dynamic = "force-dynamic";
 export default function EditorPage() {
   const { isCollapsed } = useSidebarStore();
   const { isMobile, checkDevice } = useDeviceStore();
+  const { 
+    isSpellCheckMode, 
+    getCheckedSuggestions, 
+    setSpellCheckMode, 
+    clearSuggestions 
+  } = useSpellCheckStore();
+  const { toasts, showSuccess, showError, removeToast } = useToast();
   const [originalText, setOriginalText] = useState<string>("");
   const [editedText, setEditedText] = useState<string>("");
   const [questionText, setQuestionText] = useState<string>("");
   const [questionCharLimit, setQuestionCharLimit] =
     useState<number>(DEFAULT_CHAR_LIMIT);
   const [viewMode, setViewMode] = useState<ViewMode>("original");
-  const [shareId, setShareId] = useState<string>("");
   const [isHeaderVisible, setIsHeaderVisible] = useState<boolean>(true);
   const [lastScrollY, setLastScrollY] = useState<number>(0);
   const [shareUrl, setShareUrl] = useState<string>("");
@@ -52,23 +61,48 @@ export default function EditorPage() {
   // URL에서 공유된 데이터 로드
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
+    
+    // 새로운 URL 기반 공유 데이터 처리
+    const encodedData = urlParams.get("data");
+    if (encodedData) {
+      const shareData = decodeShareData(encodedData);
+      if (shareData) {
+        setOriginalText(shareData.original);
+        setEditedText(shareData.edited);
+        setQuestionText(shareData.question || "");
+        setQuestionCharLimit(shareData.questionLimit || DEFAULT_CHAR_LIMIT);
+        setViewMode("result");
+        showSuccess("공유된 데이터를 불러왔습니다.");
+        return;
+      } else {
+        showError("공유 데이터를 불러오는데 실패했습니다.");
+      }
+    }
+    
+    // 레거시 공유 ID 처리 (하위 호환성)
     const sharedId = urlParams.get("share");
-
     if (sharedId) {
       // 로컬 스토리지에서 공유된 데이터 가져오기
       const sharedData = localStorage.getItem(`jaso_${sharedId}`);
       if (sharedData) {
-        const { original, edited, question, questionLimit } =
-          JSON.parse(sharedData);
-        setOriginalText(original);
-        setEditedText(edited);
-        setQuestionText(question || "");
-        setQuestionCharLimit(questionLimit || DEFAULT_CHAR_LIMIT);
-        setViewMode("result");
-        setShareId(sharedId);
+        try {
+          const { original, edited, question, questionLimit } =
+            JSON.parse(sharedData);
+          setOriginalText(original);
+          setEditedText(edited);
+          setQuestionText(question || "");
+          setQuestionCharLimit(questionLimit || DEFAULT_CHAR_LIMIT);
+          setViewMode("result");
+          showSuccess("공유된 데이터를 불러왔습니다.");
+        } catch (error) {
+          console.error("레거시 공유 데이터 파싱 실패:", error);
+          showError("공유 데이터를 불러오는데 실패했습니다.");
+        }
+      } else {
+        showError("공유 데이터를 찾을 수 없습니다. 링크가 올바른지 확인해주세요.");
       }
     }
-  }, []);
+  }, [showSuccess, showError]);
 
   // 디바이스 상태 초기화 및 리사이즈 감지
   useEffect(() => {
@@ -127,13 +161,9 @@ export default function EditorPage() {
     setViewMode(mode);
   };
 
-  const handleShare = useCallback((id: string) => {
-    setShareId(id);
-  }, []);
 
   const handleShareClick = useCallback(() => {
     try {
-      const shareId = generateShareId();
       const shareData: ShareData = {
         original: originalText,
         edited: editedText,
@@ -142,38 +172,60 @@ export default function EditorPage() {
         timestamp: new Date().toISOString(),
       };
 
-      // 로컬 스토리지에 데이터 저장
-      localStorage.setItem(`jaso_${shareId}`, JSON.stringify(shareData));
-
-      // 공유 URL 생성
-      const url = createShareUrl(shareId);
+      // URL 기반 공유 URL 생성
+      const url = createShareUrl(shareData);
 
       setShareUrl(url);
-      setShareId(shareId);
+      
+      // 레거시 지원을 위해 로컬 스토리지에도 저장
+      const shareId = generateShareId();
+      localStorage.setItem(`jaso_${shareId}`, JSON.stringify(shareData));
+      
+      showSuccess("공유 링크가 생성되었습니다.");
     } catch (error) {
-      console.error("공유 데이터 저장 실패:", error);
+      console.error("공유 데이터 생성 실패:", error);
+      showError("공유 링크 생성에 실패했습니다.");
     }
-  }, [originalText, editedText, questionText, questionCharLimit]);
+  }, [originalText, editedText, questionText, questionCharLimit, showSuccess, showError]);
 
   const handleCopyUrl = useCallback(async () => {
     const result = await copyToClipboard(shareUrl);
     if (result.success) {
       setIsCopied(true);
+      showSuccess("공유 링크가 클립보드에 복사되었습니다.");
       setTimeout(() => setIsCopied(false), COPY_SUCCESS_DURATION);
     } else {
-      console.error("URL 복사 실패:", result.message);
+      showError(`URL 복사 실패: ${result.message}`);
     }
-  }, [shareUrl]);
+  }, [shareUrl, showSuccess, showError]);
 
-  const handleCopyResult = useCallback(async () => {
-    const result = await copyToClipboard(editedText);
-    if (result.success) {
-      setIsCopied(true);
-      setTimeout(() => setIsCopied(false), COPY_SUCCESS_DURATION);
-    } else {
-      console.error("결과 복사 실패:", result.message);
+
+  const handleApplyCorrections = useCallback(() => {
+    const checkedSuggestions = getCheckedSuggestions();
+    
+    if (checkedSuggestions.length === 0) {
+      showError("적용할 교정 사항을 선택해주세요.");
+      return;
     }
-  }, [editedText]);
+
+    let correctedText = editedText;
+    
+    // 뒤에서부터 적용해야 인덱스가 꼬이지 않음
+    const sortedSuggestions = [...checkedSuggestions].sort((a, b) => b.start - a.start);
+    
+    sortedSuggestions.forEach((suggestion) => {
+      const selectedCorrection = suggestion.selectedSuggestion || suggestion.suggestions[0];
+      const before = correctedText.slice(0, suggestion.start);
+      const after = correctedText.slice(suggestion.end || (suggestion.start + suggestion.token.length));
+      correctedText = before + selectedCorrection + after;
+    });
+
+    setEditedText(correctedText);
+    setSpellCheckMode(false);
+    clearSuggestions();
+    
+    showSuccess(`${checkedSuggestions.length}개의 교정 사항이 적용되었습니다.`);
+  }, [editedText, getCheckedSuggestions, setEditedText, setSpellCheckMode, clearSuggestions, showSuccess, showError]);
 
   const ModeChangeButton = ({
     mode,
@@ -370,34 +422,40 @@ export default function EditorPage() {
             viewMode === "edit" ||
             viewMode === "result") && (
             <div className="lg:col-span-1">
-              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-4 sticky top-24">
-                <CharacterCount
-                  characterCount={
-                    viewMode === "original"
-                      ? getTextStats(originalText, questionCharLimit)
-                          .characterCount
-                      : getTextStats(editedText, questionCharLimit)
-                          .characterCount
-                  }
-                  wordCount={
-                    viewMode === "original"
-                      ? getTextStats(originalText, questionCharLimit).wordCount
-                      : getTextStats(editedText, questionCharLimit).wordCount
-                  }
-                  lineCount={
-                    viewMode === "original"
-                      ? getTextStats(originalText, questionCharLimit).lineCount
-                      : getTextStats(editedText, questionCharLimit).lineCount
-                  }
-                  charLimit={questionCharLimit}
-                  isOverLimit={
-                    viewMode === "original"
-                      ? getTextStats(originalText, questionCharLimit)
-                          .isOverLimit
-                      : getTextStats(editedText, questionCharLimit).isOverLimit
-                  }
-                />
-              </div>
+              {viewMode === "edit" && isSpellCheckMode ? (
+                <div className="sticky top-24">
+                  <SpellCheckSidebar onApplyCorrections={handleApplyCorrections} />
+                </div>
+              ) : (
+                <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-4 sticky top-24">
+                  <CharacterCount
+                    characterCount={
+                      viewMode === "original"
+                        ? getTextStats(originalText, questionCharLimit)
+                            .characterCount
+                        : getTextStats(editedText, questionCharLimit)
+                            .characterCount
+                    }
+                    wordCount={
+                      viewMode === "original"
+                        ? getTextStats(originalText, questionCharLimit).wordCount
+                        : getTextStats(editedText, questionCharLimit).wordCount
+                    }
+                    lineCount={
+                      viewMode === "original"
+                        ? getTextStats(originalText, questionCharLimit).lineCount
+                        : getTextStats(editedText, questionCharLimit).lineCount
+                    }
+                    charLimit={questionCharLimit}
+                    isOverLimit={
+                      viewMode === "original"
+                        ? getTextStats(originalText, questionCharLimit)
+                            .isOverLimit
+                        : getTextStats(editedText, questionCharLimit).isOverLimit
+                    }
+                  />
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -464,6 +522,17 @@ export default function EditorPage() {
           </div>
         </div>
       )}
+
+      {/* 토스트 알림 */}
+      {toasts.map((toast) => (
+        <Toast
+          key={toast.id}
+          message={toast.message}
+          type={toast.type}
+          duration={toast.duration}
+          onClose={() => removeToast(toast.id)}
+        />
+      ))}
     </div>
   );
 }
