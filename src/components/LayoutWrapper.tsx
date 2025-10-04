@@ -21,9 +21,15 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
   const handleNavigation = (href: string) => {
     if (pathname === '/editor') {
       // 에디터 페이지에서 나갈 때 확인
-      const hasContent = sessionStorage.getItem('editorContent');
-      if (hasContent && hasContent.trim()) {
+      const editorContent = sessionStorage.getItem('editorContent');
+      const hasRealContent = editorContent && 
+                            editorContent.trim() && 
+                            editorContent.trim().length > 0;
+      
+      if (hasRealContent) {
         if (window.confirm("입력한 내용이 있습니다. 정말 나가시겠습니까? 저장되지 않은 내용은 사라집니다.")) {
+          // 확인 후 sessionStorage 정리
+          sessionStorage.removeItem('editorContent');
           window.location.href = href;
         }
       } else {

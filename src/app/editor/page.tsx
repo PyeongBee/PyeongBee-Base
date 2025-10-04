@@ -96,6 +96,15 @@ export default function EditorPage() {
     }
   }, [showSuccess, showError]);
 
+  // 페이지 로드 시 sessionStorage 초기화
+  useEffect(() => {
+    // URL 파라미터가 없는 새로운 세션인 경우 sessionStorage 초기화
+    const urlParams = new URLSearchParams(window.location.search);
+    if (!urlParams.get("data") && !urlParams.get("share")) {
+      sessionStorage.removeItem('editorContent');
+    }
+  }, []);
+
   useEffect(() => {
     checkDevice();
     const handleResize = () => checkDevice();
@@ -126,20 +135,35 @@ export default function EditorPage() {
 
   const handleOriginalChange = (text: string) => {
     setOriginalText(text);
-    // 에디터 내용 변경 시 sessionStorage에 저장
-    sessionStorage.setItem('editorContent', text + editedText + questionText);
+    // 에디터 내용 변경 시 sessionStorage에 저장/삭제
+    const totalContent = text + editedText + questionText;
+    if (totalContent.trim()) {
+      sessionStorage.setItem('editorContent', totalContent);
+    } else {
+      sessionStorage.removeItem('editorContent');
+    }
   };
 
   const handleEditedChange = (text: string) => {
     setEditedText(text);
-    // 에디터 내용 변경 시 sessionStorage에 저장
-    sessionStorage.setItem('editorContent', originalText + text + questionText);
+    // 에디터 내용 변경 시 sessionStorage에 저장/삭제
+    const totalContent = originalText + text + questionText;
+    if (totalContent.trim()) {
+      sessionStorage.setItem('editorContent', totalContent);
+    } else {
+      sessionStorage.removeItem('editorContent');
+    }
   };
 
   const handleQuestionChange = (text: string) => {
     setQuestionText(text);
-    // 에디터 내용 변경 시 sessionStorage에 저장
-    sessionStorage.setItem('editorContent', originalText + editedText + text);
+    // 에디터 내용 변경 시 sessionStorage에 저장/삭제
+    const totalContent = originalText + editedText + text;
+    if (totalContent.trim()) {
+      sessionStorage.setItem('editorContent', totalContent);
+    } else {
+      sessionStorage.removeItem('editorContent');
+    }
   };
 
   const handleQuestionLimitChange = (limit: number) => {
