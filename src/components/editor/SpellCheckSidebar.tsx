@@ -1,13 +1,11 @@
 "use client";
 
-import React from "react";
+import React, { useCallback } from "react";
 import { useSpellCheckStore } from "../../stores/spellCheckStore";
+import { SpellCheckSidebarProps } from "../../types";
+import { MESSAGES, SIZES } from "../../constants";
 import { Button } from "../common/Button";
 import { CheckCircle2, Circle, Loader2 } from "lucide-react";
-
-interface SpellCheckSidebarProps {
-  onApplyCorrections: () => void;
-}
 
 const SpellCheckSidebar: React.FC<SpellCheckSidebarProps> = ({
   onApplyCorrections,
@@ -24,21 +22,21 @@ const SpellCheckSidebar: React.FC<SpellCheckSidebarProps> = ({
 
   const checkedCount = getCheckedSuggestions().length;
 
-  const handleSuggestionHover = (id: string | null) => {
+  const handleSuggestionHover = useCallback((id: string | null) => {
     setHoveredSuggestion(id);
-  };
+  }, [setHoveredSuggestion]);
 
-  const handleSuggestionClick = (suggestionId: string, suggestion: string) => {
+  const handleSuggestionClick = useCallback((suggestionId: string, suggestion: string) => {
     setSelectedSuggestion(suggestionId, suggestion);
-  };
+  }, [setSelectedSuggestion]);
 
   if (isLoading) {
     return (
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-4">
         <div className="flex items-center justify-center py-8">
-          <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
+          <Loader2 className={`${SIZES.ICON_LARGE} animate-spin text-blue-500`} />
           <span className="ml-2 text-gray-600 dark:text-gray-400">
-            맞춤법 검사 중...
+            {MESSAGES.SPELL_CHECK.LOADING}
           </span>
         </div>
       </div>
@@ -49,7 +47,7 @@ const SpellCheckSidebar: React.FC<SpellCheckSidebarProps> = ({
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-4">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-          맞춤법 교정
+          {MESSAGES.LABELS.SPELL_CHECK_TITLE}
         </h3>
         <span className="text-sm text-gray-500 dark:text-gray-400">
           {suggestions.length}개 발견
@@ -64,7 +62,7 @@ const SpellCheckSidebar: React.FC<SpellCheckSidebarProps> = ({
             className="w-full"
             variant="primary"
           >
-            교정 완료 ({checkedCount}개 적용)
+            {MESSAGES.BUTTONS.APPLY_CORRECTIONS} ({checkedCount}개 적용)
           </Button>
         </div>
       )}
@@ -72,8 +70,8 @@ const SpellCheckSidebar: React.FC<SpellCheckSidebarProps> = ({
       <div className="space-y-3 max-h-96 overflow-y-auto">
         {suggestions.length === 0 ? (
           <div className="text-center py-8 text-gray-500 dark:text-gray-400">
-            <CheckCircle2 className="w-12 h-12 mx-auto mb-2 text-green-500" />
-            <p>맞춤법 오류가 없습니다!</p>
+            <CheckCircle2 className={`${SIZES.ICON_XL} mx-auto mb-2 text-green-500`} />
+            <p>{MESSAGES.SPELL_CHECK.NO_ERRORS_FOUND}</p>
           </div>
         ) : (
           suggestions.map((suggestion) => (
@@ -93,9 +91,9 @@ const SpellCheckSidebar: React.FC<SpellCheckSidebarProps> = ({
                   className="mt-1 flex-shrink-0"
                 >
                   {suggestion.isChecked ? (
-                    <CheckCircle2 className="w-5 h-5 text-blue-500" />
+                    <CheckCircle2 className={`${SIZES.ICON_MEDIUM} text-blue-500`} />
                   ) : (
-                    <Circle className="w-5 h-5 text-gray-400" />
+                    <Circle className={`${SIZES.ICON_MEDIUM} text-gray-400`} />
                   )}
                 </button>
 
@@ -114,7 +112,7 @@ const SpellCheckSidebar: React.FC<SpellCheckSidebarProps> = ({
                       <button
                         key={index}
                         onClick={() => handleSuggestionClick(suggestion.id, sug)}
-                        className={`block w-full text-left px-2 py-1 text-sm rounded transition-colors ${
+                        className={`block text-left px-2 py-1 text-sm rounded transition-colors ${
                           suggestion.selectedSuggestion === sug
                             ? "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300"
                             : "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-900/50"
