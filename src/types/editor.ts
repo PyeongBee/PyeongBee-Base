@@ -25,6 +25,14 @@ export interface ShareData {
   timestamp: string;
 }
 
+export interface ShareHistory {
+  id: string;
+  title: string;
+  url: string;
+  shareData: ShareData;
+  createdAt: string;
+}
+
 export interface CharacterCountProps {
   characterCount: number;
   wordCount: number;

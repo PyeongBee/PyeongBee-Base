@@ -15,6 +15,7 @@ import {
   generateShareId,
   decodeShareData,
 } from "../../utils/clipboardUtils";
+import { saveShareHistory } from "../../utils/shareHistoryUtils";
 import {
   DEFAULT_CHAR_LIMIT,
   COPY_SUCCESS_DURATION,
@@ -192,6 +193,9 @@ export default function EditorPage() {
       
       const shareId = generateShareId();
       localStorage.setItem(`jaso_${shareId}`, JSON.stringify(shareData));
+      
+      // 공유 기록을 로컬스토리지에 저장
+      saveShareHistory(shareData, url);
       
       showSuccess("공유 링크가 생성되었습니다.");
     } catch (error) {
