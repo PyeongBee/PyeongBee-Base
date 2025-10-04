@@ -1,14 +1,9 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { CheckCircle, AlertCircle, X } from "lucide-react";
-
-interface ToastProps {
-  message: string;
-  type?: "success" | "error" | "info";
-  duration?: number;
-  onClose: () => void;
-}
+import { ToastProps } from "../../types";
+import { MESSAGES, SIZES, Z_INDEX } from "../../constants";
 
 const Toast: React.FC<ToastProps> = ({ 
   message, 
@@ -17,6 +12,14 @@ const Toast: React.FC<ToastProps> = ({
   onClose 
 }) => {
   const [isVisible, setIsVisible] = useState(false);
+
+  const handleClose = useCallback(() => {
+    setIsVisible(false);
+    // 애니메이션 완료 후 컴포넌트 제거
+    setTimeout(() => {
+      onClose();
+    }, 300);
+  }, [onClose]);
 
   useEffect(() => {
     // 컴포넌트 마운트 시 애니메이션 시작
@@ -28,24 +31,16 @@ const Toast: React.FC<ToastProps> = ({
     }, duration);
 
     return () => clearTimeout(timer);
-  }, [duration]);
-
-  const handleClose = () => {
-    setIsVisible(false);
-    // 애니메이션 완료 후 컴포넌트 제거
-    setTimeout(() => {
-      onClose();
-    }, 300);
-  };
+  }, [duration, handleClose]);
 
   const getIcon = () => {
     switch (type) {
       case "success":
-        return <CheckCircle className="w-5 h-5 text-green-500" />;
+        return <CheckCircle className={`${SIZES.ICON_MEDIUM} text-green-500`} />;
       case "error":
-        return <AlertCircle className="w-5 h-5 text-red-500" />;
+        return <AlertCircle className={`${SIZES.ICON_MEDIUM} text-red-500`} />;
       default:
-        return <CheckCircle className="w-5 h-5 text-blue-500" />;
+        return <CheckCircle className={`${SIZES.ICON_MEDIUM} text-blue-500`} />;
     }
   };
 
@@ -63,7 +58,7 @@ const Toast: React.FC<ToastProps> = ({
   return (
     <div
       className={`
-        fixed top-6 left-1/2 transform -translate-x-1/2 z-[1200]
+        fixed top-6 left-1/2 transform -translate-x-1/2 ${Z_INDEX.TOAST}
         flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg border
         ${getBackgroundColor()}
         transition-all duration-300 ease-in-out
@@ -81,9 +76,9 @@ const Toast: React.FC<ToastProps> = ({
       <button
         onClick={handleClose}
         className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-        aria-label="토스트 닫기"
+        aria-label={MESSAGES.LABELS.CLOSE_TOAST}
       >
-        <X className="w-4 h-4" />
+        <X className={SIZES.ICON_SMALL} />
       </button>
     </div>
   );

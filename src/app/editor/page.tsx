@@ -1,10 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import DiffViewer from "../../components/editor/DiffViewer";
-import Editor from "../../components/editor/Editor";
-import OriginalEditor from "../../components/editor/OriginalEditor";
-import SpellCheckSidebar from "../../components/editor/SpellCheckSidebar";
+import { LazyDiffViewer, LazyEditor, LazyOriginalEditor, LazySpellCheckSidebar } from "../../components/lazy/index";
 import { useSidebarStore } from "../../stores/sidebarStore";
 import { useDeviceStore } from "../../stores/deviceStore";
 import { useSpellCheckStore } from "../../stores/spellCheckStore";
@@ -34,7 +31,6 @@ import {
 import { Share2 } from "lucide-react";
 import Toast from "../../components/common/Toast";
 
-// 에디터 페이지는 독립적으로 렌더링
 export const dynamic = "force-dynamic";
 
 export default function EditorPage() {
@@ -58,11 +54,9 @@ export default function EditorPage() {
   const [shareUrl, setShareUrl] = useState<string>("");
   const [isCopied, setIsCopied] = useState<boolean>(false);
 
-  // URL에서 공유된 데이터 로드
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     
-    // 새로운 URL 기반 공유 데이터 처리
     const encodedData = urlParams.get("data");
     if (encodedData) {
       const shareData = decodeShareData(encodedData);
@@ -79,10 +73,8 @@ export default function EditorPage() {
       }
     }
     
-    // 레거시 공유 ID 처리 (하위 호환성)
     const sharedId = urlParams.get("share");
     if (sharedId) {
-      // 로컬 스토리지에서 공유된 데이터 가져오기
       const sharedData = localStorage.getItem(`jaso_${sharedId}`);
       if (sharedData) {
         try {
@@ -104,33 +96,24 @@ export default function EditorPage() {
     }
   }, [showSuccess, showError]);
 
-  // 디바이스 상태 초기화 및 리사이즈 감지
   useEffect(() => {
     checkDevice();
-
-    const handleResize = () => {
-      checkDevice();
-    };
-
+    const handleResize = () => checkDevice();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, [checkDevice]);
 
-  // 스크롤 이벤트 핸들러 (모바일에서만)
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollY = window.scrollY;
 
       if (isMobile) {
         if (currentScrollY > lastScrollY && currentScrollY > 100) {
-          // 아래로 스크롤할 때 헤더 숨김
           setIsHeaderVisible(false);
         } else if (currentScrollY < lastScrollY) {
-          // 위로 스크롤할 때 헤더 표시
           setIsHeaderVisible(true);
         }
       } else {
-        // 데스크톱에서는 항상 헤더 표시
         setIsHeaderVisible(true);
       }
 
@@ -177,7 +160,6 @@ export default function EditorPage() {
 
       setShareUrl(url);
       
-      // 레거시 지원을 위해 로컬 스토리지에도 저장
       const shareId = generateShareId();
       localStorage.setItem(`jaso_${shareId}`, JSON.stringify(shareData));
       
@@ -210,7 +192,6 @@ export default function EditorPage() {
 
     let correctedText = editedText;
     
-    // 뒤에서부터 적용해야 인덱스가 꼬이지 않음
     const sortedSuggestions = [...checkedSuggestions].sort((a, b) => b.start - a.start);
     
     sortedSuggestions.forEach((suggestion) => {
@@ -285,7 +266,6 @@ export default function EditorPage() {
 
       <div className="mt-20 px-6 py-4 bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* 문항 입력 영역 */}
 
           {viewMode === "original" ? (
             <div className="lg:col-span-3">
@@ -316,7 +296,6 @@ export default function EditorPage() {
             </div>
           )}
 
-          {/* 글자수 제한 설정 영역 */}
           {viewMode === "original" && (
             <div className="lg:col-span-1">
               <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-4 sticky top-24">
@@ -384,7 +363,6 @@ export default function EditorPage() {
               : ""
           }`}
         >
-          {/* 메인 에디터 영역 */}
           <div
             className={
               viewMode === "original" ||
@@ -395,13 +373,13 @@ export default function EditorPage() {
             }
           >
             {viewMode === "original" ? (
-              <OriginalEditor
+              <LazyOriginalEditor
                 originalText={originalText}
                 onOriginalChange={handleOriginalChange}
                 charLimit={questionCharLimit}
               />
             ) : viewMode === "edit" ? (
-              <Editor
+              <LazyEditor
                 originalText={originalText}
                 editedText={editedText}
                 onOriginalChange={handleOriginalChange}
@@ -409,7 +387,7 @@ export default function EditorPage() {
                 charLimit={questionCharLimit}
               />
             ) : (
-              <DiffViewer
+              <LazyDiffViewer
                 originalText={originalText}
                 editedText={editedText}
                 charLimit={questionCharLimit}
@@ -417,14 +395,13 @@ export default function EditorPage() {
             )}
           </div>
 
-          {/* 사이드바 영역 */}
           {(viewMode === "original" ||
             viewMode === "edit" ||
             viewMode === "result") && (
             <div className="lg:col-span-1">
               {viewMode === "edit" && isSpellCheckMode ? (
                 <div className="sticky top-24">
-                  <SpellCheckSidebar onApplyCorrections={handleApplyCorrections} />
+                  <LazySpellCheckSidebar onApplyCorrections={handleApplyCorrections} />
                 </div>
               ) : (
                 <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-4 sticky top-24">
@@ -461,7 +438,6 @@ export default function EditorPage() {
         </div>
       </main>
 
-      {/* 플로팅 공유 버튼 */}
       <button
         onClick={handleShareClick}
         className={`fixed right-3 z-[1000] 
@@ -478,7 +454,6 @@ export default function EditorPage() {
         <Share2 className="w-6 h-6 text-white group-hover:scale-110 transition-transform duration-200" />
       </button>
 
-      {/* 공유 URL 모달 */}
       {shareUrl && (
         <div
           className="fixed inset-0 bg-black/50 flex items-center justify-center z-[1100] p-4"
@@ -504,7 +479,7 @@ export default function EditorPage() {
               <InputField
                 type="text"
                 value={shareUrl}
-                onChange={() => {}} // readOnly이므로 빈 함수
+                onChange={() => {}}
                 className="flex-1 bg-gray-50 dark:bg-gray-700 text-sm"
                 placeholder="공유 URL"
               />
@@ -523,7 +498,6 @@ export default function EditorPage() {
         </div>
       )}
 
-      {/* 토스트 알림 */}
       {toasts.map((toast) => (
         <Toast
           key={toast.id}

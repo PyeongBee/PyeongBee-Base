@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "HoneyPot",
+  title: "HoneyFlow",
   description: "자소서 작성 및 프로젝트 공유 플랫폼",
 };
 
