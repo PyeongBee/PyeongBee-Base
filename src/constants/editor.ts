@@ -9,5 +9,6 @@ export const CHAR_LIMIT_STEP = 50;
 
 export const COPY_SUCCESS_DURATION = 2000; // 2초
 export const LONG_PRESS_DURATION = 500; // 0.5초
+export const TOOLTIP_DISPLAY_DURATION = 1000; // 1초
 
 export const MOBILE_BREAKPOINT = 768;

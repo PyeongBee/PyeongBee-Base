@@ -1,13 +1,12 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { Share2, ExternalLink, Trash2, Calendar, BarChart3 } from "lucide-react";
+import { Share2, ExternalLink, Trash2 } from "lucide-react";
 import { ShareHistory } from "../../types/editor";
 import { 
   getShareHistory, 
   deleteShareHistory, 
-  clearShareHistory, 
-  getShareHistoryStats 
+  clearShareHistory,
 } from "../../utils/shareHistoryUtils";
 import { copyToClipboard } from "../../utils/clipboardUtils";
 import { useToastStore } from "../../stores/toastStore";
@@ -17,16 +16,13 @@ import Toast from "../../components/common/Toast";
 
 export default function ActivityPage() {
   const [shareHistory, setShareHistory] = useState<ShareHistory[]>([]);
-  const [stats, setStats] = useState({ total: 0, thisWeek: 0, thisMonth: 0 });
   const [isLoading, setIsLoading] = useState(true);
   const { toasts, showSuccess, showError, removeToast } = useToastStore();
 
   const loadShareHistory = useCallback(() => {
     try {
       const history = getShareHistory();
-      const historyStats = getShareHistoryStats();
       setShareHistory(history);
-      setStats(historyStats);
     } catch (error) {
       console.error('공유 기록 로드 실패:', error);
       showError('공유 기록을 불러오는데 실패했습니다.');
@@ -35,7 +31,6 @@ export default function ActivityPage() {
     }
   }, [showError]);
 
-  // 공유 기록 로드
   useEffect(() => {
     loadShareHistory();
   }, [loadShareHistory]);
@@ -154,8 +149,8 @@ export default function ActivityPage() {
                   key={item.id}
                   className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                 >
-                  {/* 1행: 5열 구조 (질문 3열 | 시간 1열 | 버튼들 1열) */}
-                  <div className="grid grid-cols-5 gap-4 items-center mb-3">
+                  {/* 데스크톱: 1행 5열 구조 */}
+                  <div className="hidden md:grid md:grid-cols-5 gap-4 items-center mb-3">
                     {/* 1-3열: 질문 (3열 차지) */}
                     <div className="col-span-3">
                       <h3 className="text-lg font-medium text-gray-900 dark:text-white truncate">
@@ -200,6 +195,60 @@ export default function ActivityPage() {
                           <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>
+                    </div>
+                  </div>
+
+                  {/* 모바일: 2행 구조 */}
+                  <div className="md:hidden mb-3">
+                    {/* 1행: 질문 3열 + 버튼들 2열 */}
+                    <div className="grid grid-cols-5 gap-2 items-center mb-2">
+                      {/* 질문 (3열) */}
+                      <div className="col-span-3">
+                        <h3 className="text-base font-medium text-gray-900 dark:text-white truncate">
+                          {item.title}
+                        </h3>
+                      </div>
+                      
+                      {/* 버튼들 (2열) */}
+                      <div className="col-span-2 flex items-center justify-end space-x-1">
+                        <div title="링크 복사">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleCopyUrl(item.url)}
+                            className="p-1.5"
+                          >
+                            <Share2 className="w-3.5 h-3.5" />
+                          </Button>
+                        </div>
+                        <div title="새 탭에서 열기">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => window.open(item.url, '_blank')}
+                            className="p-1.5"
+                          >
+                            <ExternalLink className="w-3.5 h-3.5" />
+                          </Button>
+                        </div>
+                        <div title="삭제">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleDeleteItem(item.id)}
+                            className="text-red-600 hover:text-red-700 p-1.5"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* 2행: 시간 정보 */}
+                    <div className="flex justify-start">
+                      <p className="text-xs text-gray-600 dark:text-gray-400">
+                        {formatDate(item.createdAt)}
+                      </p>
                     </div>
                   </div>
                   

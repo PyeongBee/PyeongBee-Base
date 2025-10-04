@@ -219,6 +219,50 @@ export function getSidebarClasses(
   );
 }
 
+export function getDropdownClasses(
+  position: 'top' | 'bottom' = 'top',
+  align: 'left' | 'center' | 'right' = 'left',
+  isCollapsed?: boolean,
+  className?: string
+) {
+  return cn(
+    dropdownStyles.base,
+    dropdownStyles.positions[position],
+    align === 'center' ? dropdownStyles.alignments.center :
+    align === 'right' ? dropdownStyles.alignments.right :
+    isCollapsed !== undefined ? 
+      (isCollapsed ? dropdownStyles.sidebarAlignments.collapsed : dropdownStyles.sidebarAlignments.expanded) :
+      dropdownStyles.alignments.left,
+    className
+  );
+}
+
+export function getDropdownArrowClasses(
+  position: 'top' | 'bottom' = 'top',
+  align: 'left' | 'center' | 'right' = 'left'
+) {
+  return cn(
+    dropdownStyles.arrow.base,
+    position === 'bottom' ? dropdownStyles.arrow.bottom : dropdownStyles.arrow.top,
+    align === 'center' ? dropdownStyles.arrow.center : dropdownStyles.arrow.left
+  );
+}
+
+export function getMobileNavButtonClasses(className?: string) {
+  return cn(mobileNavStyles.button, className);
+}
+
+export function getSidebarMenuItemClasses(
+  isCollapsed: boolean = false,
+  className?: string
+) {
+  return cn(
+    sidebarMenuItemStyles.base,
+    isCollapsed ? sidebarMenuItemStyles.collapsed : sidebarMenuItemStyles.expanded,
+    className
+  );
+}
+
 // 사이드바 스타일 시스템
 export const sidebarStyles = {
   base: [
@@ -232,6 +276,80 @@ export const sidebarStyles = {
   logo: {
     size: 48,
   },
+} as const;
+
+// 드롭다운 스타일 시스템
+export const dropdownStyles = {
+  base: [
+    'absolute bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50 w-48',
+    'transition-all duration-200 ease-out transform opacity-100 scale-100',
+  ],
+  positions: {
+    top: 'top-full mt-2',
+    bottom: 'bottom-full mb-2',
+  },
+  alignments: {
+    left: 'left-0',
+    center: 'left-1/2 transform -translate-x-1/2',
+    right: 'right-0',
+  },
+  sidebarAlignments: {
+    collapsed: 'left-12',
+    expanded: 'left-full ml-2',
+  },
+  menuItem: [
+    'flex items-center w-full px-4 py-2 text-sm text-gray-700 dark:text-gray-300',
+    'hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors',
+  ],
+  divider: 'border-t border-gray-200 dark:border-gray-600 my-1',
+  arrow: {
+    base: 'absolute w-0 h-0 border-l-2 border-r-2 border-transparent',
+    top: 'bottom-full border-b-2 border-b-white dark:border-b-gray-800',
+    bottom: 'top-full border-t-2 border-t-white dark:border-t-gray-800',
+    center: 'left-1/2 transform -translate-x-1/2',
+    left: 'left-6',
+  },
+} as const;
+
+// 모바일 네비게이션 스타일 시스템
+export const mobileNavStyles = {
+  container: [
+    'fixed bottom-0 left-0 right-0 bg-white dark:bg-gray-900',
+    'border-t border-gray-200 dark:border-gray-700 md:hidden z-50 shadow-lg',
+  ],
+  nav: 'flex justify-around py-1',
+  button: [
+    'flex items-center justify-center w-10 h-10 rounded-lg',
+    'transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-800',
+    'hover:scale-105 active:scale-95',
+  ],
+  icon: 'w-6 h-6 text-gray-600 dark:text-gray-400',
+  tooltip: {
+    container: [
+      'absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2',
+      'px-2 py-1 bg-gray-900 dark:bg-gray-700 text-white text-xs rounded whitespace-nowrap z-10',
+    ],
+    arrow: [
+      'absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0',
+      'border-l-2 border-r-2 border-t-2 border-transparent',
+      'border-t-gray-900 dark:border-t-gray-700',
+    ],
+  },
+} as const;
+
+// 사이드바 메뉴 아이템 스타일 시스템
+export const sidebarMenuItemStyles = {
+  base: [
+    'flex items-center rounded-lg transition-all duration-200 w-full text-left',
+    'hover:bg-gray-100 dark:hover:bg-gray-800 hover:scale-105',
+  ],
+  collapsed: 'justify-center h-10 px-2',
+  expanded: 'h-10 px-3',
+  icon: {
+    container: 'flex items-center justify-center w-5 h-5 flex-shrink-0',
+    size: 'w-5 h-5 text-gray-600 dark:text-gray-400',
+  },
+  label: 'text-gray-700 dark:text-gray-300 ml-3 text-sm leading-5 truncate flex-1',
 } as const;
 
 // 토스트 시간 상수
