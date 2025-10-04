@@ -3,8 +3,8 @@
 import Link from "next/link";
 import {
   FileText,
-  Share2,
-  User,
+  UserSearch,
+  CircleUserRound,
   MoreHorizontal,
   ChevronLeft,
   ChevronRight,
@@ -18,8 +18,8 @@ interface SidebarProps {
 export default function Sidebar({ isCollapsed, onToggle }: SidebarProps) {
   const menuItems = [
     { icon: FileText, label: "자소서 에디터", href: "/editor" },
-    { icon: Share2, label: "프로젝트 공유", href: "/share" },
-    { icon: User, label: "프로필", href: "/profile" },
+    { icon: UserSearch, label: "스터디 목록", href: "/study" },
+    { icon: CircleUserRound, label: "프로필", href: "/profile" },
     { icon: MoreHorizontal, label: "더 보기", href: "/more" },
   ];
 

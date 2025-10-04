@@ -50,8 +50,6 @@ export default function LayoutWrapper({ children }: LayoutWrapperProps) {
             className={`mx-auto ${
               isMobile
                 ? "w-full px-4"
-                : isCollapsed
-                ? "w-full px-6"
                 : "w-full px-6"
             }`}
           >
