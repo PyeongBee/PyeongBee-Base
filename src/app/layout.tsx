@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "HoneyFlow",
-  description: "자소서 작성 및 프로젝트 공유 플랫폼",
+  title: "HoneyPot",
+  description: "평비의 꿀단지 - 자소서 작성 및 프로젝트 공유 플랫폼",
 };
 
 export default function RootLayout({
