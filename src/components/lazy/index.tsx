@@ -4,7 +4,7 @@
 
 import dynamic from 'next/dynamic';
 import { ComponentType } from 'react';
-import { EditorProps, SpellCheckSidebarProps } from '../../types';
+import { SpellCheckSidebarProps } from '../../types';
 
 // 로딩 컴포넌트
 const LoadingSpinner = () => (
@@ -20,7 +20,7 @@ export const LazyEditor = dynamic(
     loading: LoadingSpinner,
     ssr: false,
   }
-) as ComponentType<EditorProps>;
+);
 
 export const LazySpellCheckSidebar = dynamic(
   () => import('../editor/SpellCheckSidebar'),

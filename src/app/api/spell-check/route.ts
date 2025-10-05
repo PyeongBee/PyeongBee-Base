@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     // hanspell 라이브러리 동적 import
     const hanspell = await import('hanspell');
 
-    return new Promise((resolve, reject) => {
+    return new Promise<Response>((resolve, reject) => {
       const results: SpellCheckResult[] = [];
 
       try {
@@ -62,14 +62,14 @@ export async function POST(request: NextRequest) {
             }
           );
         } else {
-          reject(NextResponse.json(
+          resolve(NextResponse.json(
             { error: 'hanspell 라이브러리를 찾을 수 없습니다.' },
             { status: 500 }
           ));
         }
       } catch (hanspellError) {
         console.error('hanspell 실행 오류:', hanspellError);
-        reject(NextResponse.json(
+        resolve(NextResponse.json(
           { error: 'hanspell 실행 중 오류가 발생했습니다.' },
           { status: 500 }
         ));

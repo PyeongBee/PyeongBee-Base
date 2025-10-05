@@ -8,7 +8,8 @@ import {
   getDropdownArrowClasses, 
   getSidebarMenuItemClasses,
   dropdownStyles,
-  sidebarMenuItemStyles 
+  sidebarMenuItemStyles,
+  cn
 } from "../../styles/components";
 
 interface MoreMenuDropdownProps {
@@ -97,7 +98,7 @@ const MoreMenuDropdown: React.FC<MoreMenuDropdownProps> = ({
             <button
               key={index}
               onClick={() => handleItemClick(item.href)}
-              className={dropdownStyles.menuItem}
+              className={cn(dropdownStyles.menuItem)}
             >
               <item.icon className="w-4 h-4 mr-3" />
               {item.label}
@@ -110,7 +111,7 @@ const MoreMenuDropdown: React.FC<MoreMenuDropdownProps> = ({
           {/* 로그인/로그아웃 메뉴 */}
           <button
             onClick={() => handleItemClick(authItem.href)}
-            className={dropdownStyles.menuItem}
+            className={cn(dropdownStyles.menuItem)}
           >
             <authItem.icon className="w-4 h-4 mr-3" />
             {authItem.label}

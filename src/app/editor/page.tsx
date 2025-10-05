@@ -415,9 +415,7 @@ export default function EditorPage() {
               <LazyEditor
                 originalText={originalText}
                 editedText={editedText}
-                onOriginalChange={handleOriginalChange}
                 onEditedChange={handleEditedChange}
-                charLimit={questionCharLimit}
               />
             ) : (
               <LazyDiffViewer
