@@ -7,7 +7,7 @@ import { FileText, MoreHorizontal, Settings, Activity, LogIn, LogOut } from "luc
 export const NAVIGATION = {
   LOGO_PATH: '/logo_Bee_lsh_clear_gra.png',
   LOGO_ALT: '로고',
-  APP_NAME: 'Honey Flow',
+  APP_NAME: '평비의 꿀단지',
 } as const;
 
 // 메뉴 라벨 상수

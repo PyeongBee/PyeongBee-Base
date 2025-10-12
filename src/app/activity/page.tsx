@@ -166,7 +166,7 @@ export default function ActivityPage() {
                     </div>
                     
                     {/* 5열: 버튼들 */}
-                    <div className="col-span-1 flex items-center justify-end space-x-2">
+                    <div className="col-span-1 flex items-center justify-end space-x-1">
                       <div title="링크 복사">
                         <Button
                           variant="ghost"
